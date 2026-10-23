@@ -17,10 +17,7 @@ public class FileManager {
 
                 int spaces = 0;
                 for (ElementType type : ElementType.values()) {
-                    if (type.getSwingIndent() == indent) {
-                        spaces = type.getTxtSpaces();
-                        break;
-                    }
+                    if (type.getSwingIndent() == indent) { spaces = type.getTxtSpaces(); break; }
                 }
 
                 int start = p.getStartOffset();
@@ -33,28 +30,27 @@ public class FileManager {
         }
     }
 
-    public static void openFromTxt(StyledDocument doc, String filepath) throws Exception {
-        doc.remove(0, doc.getLength()); // Clear current document
+    public static void openFromTxt(StyledDocument doc, DocumentType docType, String filepath) throws Exception {
+        doc.remove(0, doc.getLength());
         List<String> lines = Files.readAllLines(Paths.get(filepath));
+
+        ElementType[] validTypes = ElementType.getValuesFor(docType);
 
         for (String line : lines) {
             int spaceCount = 0;
-            while (spaceCount < line.length() && line.charAt(spaceCount) == ' ') {
-                spaceCount++;
-            }
+            while (spaceCount < line.length() && line.charAt(spaceCount) == ' ') spaceCount++;
 
-            ElementType matchedType = ElementType.ACTION; // Default fallback
-            for (ElementType type : ElementType.values()) {
-                // Approximate match for spaces to handle slight formatting differences
+            ElementType matchedType = validTypes[0];
+            for (ElementType type : validTypes) {
                 if (Math.abs(type.getTxtSpaces() - spaceCount) <= 2 && spaceCount > 0) {
-                    matchedType = type;
-                    break;
+                    matchedType = type; break;
                 }
             }
 
             String text = line.substring(spaceCount);
             SimpleAttributeSet attrs = new SimpleAttributeSet();
             StyleConstants.setLeftIndent(attrs, matchedType.getSwingIndent());
+            StyleConstants.setFirstLineIndent(attrs, matchedType.getFirstLineIndent());
             attrs.addAttribute("ElementType", matchedType.name());
 
             int len = doc.getLength();
