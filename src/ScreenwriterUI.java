@@ -18,6 +18,10 @@ public class ScreenwriterUI extends JFrame {
     private JCheckBoxMenuItem clackToggle, bellToggle, returnToggle;
     private JButton dedicatedExitButton;
 
+    // Autocomplete Components
+    private JPopupMenu suggestionMenu;
+    private String currentSuggestion = null;
+
     private final DocumentType documentType;
     private ElementType currentMode;
     private Theme currentTheme = Theme.DARK;
@@ -38,6 +42,10 @@ public class ScreenwriterUI extends JFrame {
         setSize(1000, 800);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
+
+        suggestionMenu = new JPopupMenu();
+        suggestionMenu.setFocusable(false); // Prevents popup from stealing typing focus
+        suggestionMenu.setBorder(BorderFactory.createLineBorder(new Color(100, 100, 100)));
 
         textPane = new JTextPane() {
             @Override
@@ -109,8 +117,8 @@ public class ScreenwriterUI extends JFrame {
 
         changeTypeItem = new JMenuItem();
         changeTypeItem.addActionListener(e -> {
-            this.dispose(); // Zavře aktuální editor
-            Main.showLauncher(); // Vrátí se do Hubu
+            this.dispose();
+            Main.showLauncher();
         });
 
         exitMenuItem = new JMenuItem(); exitMenuItem.addActionListener(e -> System.exit(0));
@@ -210,7 +218,7 @@ public class ScreenwriterUI extends JFrame {
         fileMenu.setText(Localization.get("File"));
         newItem.setText(Localization.get("New")); openItem.setText(Localization.get("Open"));
         saveItem.setText(Localization.get("Save")); printItem.setText(Localization.get("Print"));
-        changeTypeItem.setText(Localization.get("ChangeType")); // Překlad nového tlačítka
+        changeTypeItem.setText(Localization.get("ChangeType"));
         exitMenuItem.setText(Localization.get("Exit"));
         dedicatedExitButton.setText(" " + Localization.get("Exit") + " ");
 
@@ -259,6 +267,66 @@ public class ScreenwriterUI extends JFrame {
         } catch (Exception ex) { JOptionPane.showMessageDialog(this, Localization.get("Error") + ex.getMessage()); }
     }
 
+    // --- PREDICTIVE TEXT ENGINE ---
+    private String[] getSuggestionsForCurrentMode() {
+        if (currentMode == ElementType.SCENE_HEADING || currentMode == ElementType.AUDIO_SCENE) {
+            return new String[]{"INT. ", "EXT. ", "INT/EXT. "};
+        } else if (currentMode == ElementType.TRANSITION) {
+            return new String[]{"CUT TO:", "FADE IN:", "FADE OUT:", "DISSOLVE TO:"};
+        } else if (currentMode == ElementType.CHAPTER_HEADING) {
+            return new String[]{"CHAPTER "};
+        } else if (currentMode == ElementType.PAGE_PANEL) {
+            return new String[]{"PAGE ", "PANEL "};
+        } else if (currentMode == ElementType.ACT_SCENE) {
+            return new String[]{"ACT ", "SCENE "};
+        }
+        return null; // Return null for creative elements (Action, Dialogue, Prose) to prevent intrusion
+    }
+
+    private void triggerAutocompleteCheck(int caretOffset) {
+        SwingUtilities.invokeLater(() -> {
+            suggestionMenu.setVisible(false);
+            String[] dict = getSuggestionsForCurrentMode();
+            if (dict == null) return;
+
+            try {
+                javax.swing.text.Element p = textPane.getStyledDocument().getParagraphElement(caretOffset);
+                int start = p.getStartOffset();
+                String text = textPane.getText(start, caretOffset - start).toUpperCase();
+
+                if (text.trim().isEmpty()) {
+                    currentSuggestion = null;
+                    return;
+                }
+
+                suggestionMenu.removeAll();
+                boolean foundMatch = false;
+
+                for (String word : dict) {
+                    if (word.startsWith(text) && !word.equals(text)) {
+                        JMenuItem item = new JMenuItem(word + "  (Press Enter)");
+                        item.setFocusable(false);
+                        item.setBackground(currentTheme.statusBg);
+                        item.setForeground(currentTheme.accent);
+                        item.setFont(new Font(currentFontName, Font.BOLD, currentFontSize - 4));
+                        suggestionMenu.add(item);
+                        currentSuggestion = word;
+                        foundMatch = true;
+                        break; // Display only the closest top match to keep it clean
+                    }
+                }
+
+                if (foundMatch) {
+                    Rectangle rect = textPane.modelToView2D(caretOffset).getBounds();
+                    suggestionMenu.show(textPane, rect.x, rect.y + rect.height + 5);
+                    textPane.requestFocusInWindow();
+                } else {
+                    currentSuggestion = null;
+                }
+            } catch (Exception e) {}
+        });
+    }
+
     private void setupListeners() {
         textPane.addCaretListener(e -> {
             StyledDocument doc = textPane.getStyledDocument();
@@ -283,12 +351,31 @@ public class ScreenwriterUI extends JFrame {
         im.put(KeyStroke.getKeyStroke("TAB"), "tab-action");
         am.put("tab-action", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
+                suggestionMenu.setVisible(false);
+                currentSuggestion = null;
                 currentMode = currentMode.next(); applyCurrentFormatting(); updateStatus(); TypewriterSound.playClick();
             }
         });
+
         im.put(KeyStroke.getKeyStroke("ENTER"), "enter-action");
         am.put("enter-action", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
+                // If the suggestion popup is visible, ENTER auto-fills the word instead of making a new line
+                if (suggestionMenu.isVisible() && currentSuggestion != null) {
+                    suggestionMenu.setVisible(false);
+                    try {
+                        javax.swing.text.Element p = textPane.getStyledDocument().getParagraphElement(textPane.getCaretPosition());
+                        int start = p.getStartOffset();
+                        int end = textPane.getCaretPosition();
+                        textPane.getStyledDocument().remove(start, end - start);
+                        textPane.getStyledDocument().insertString(start, currentSuggestion, textPane.getCharacterAttributes());
+                        TypewriterSound.playClick();
+                    } catch (Exception ex) {}
+                    currentSuggestion = null;
+                    return;
+                }
+
+                suggestionMenu.setVisible(false);
                 textPane.replaceSelection("\n"); currentMode = currentMode.getSmartNext();
                 applyCurrentFormatting(); updateStatus(); TypewriterSound.playReturn();
             }
@@ -311,6 +398,7 @@ public class ScreenwriterUI extends JFrame {
                 if (!processHardStop(fb, offset, string)) return;
                 if (currentMode.isAutoCapitalize() && string != null) string = string.toUpperCase();
                 super.insertString(fb, offset, string, attr); TypewriterSound.playClick();
+                triggerAutocompleteCheck(offset + string.length());
             }
 
             public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
@@ -318,10 +406,12 @@ public class ScreenwriterUI extends JFrame {
                 if (currentMode.isAutoCapitalize() && text != null) text = text.toUpperCase();
                 super.replace(fb, offset, length, text, attrs);
                 if (text != null && text.length() == 1) TypewriterSound.playClick();
+                triggerAutocompleteCheck(offset + (text != null ? text.length() : 0));
             }
 
             public void remove(FilterBypass fb, int offset, int length) throws BadLocationException {
                 super.remove(fb, offset, length); TypewriterSound.playClick();
+                triggerAutocompleteCheck(offset);
             }
         });
     }
