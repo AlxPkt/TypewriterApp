@@ -5,18 +5,18 @@ public class Localization {
     public static String get(String key) {
         if (current == Lang.CZECH) {
             switch (key) {
-                case "File": return "Soubor"; case "New": return "Nový..."; case "Open": return "Otevřít..."; case "Save": return "Uložit jako .txt..."; case "Print": return "Tisk..."; case "Exit": return "Ukončit";
-                case "View": return "Zobrazení"; case "Fullscreen": return "Celá obrazovka"; case "Focus": return "Soustředění (Focus)";
-                case "Alignment": return "Zarovnání textu"; case "AlignLeft": return "Doleva"; case "AlignCenter": return "Na střed"; case "AlignRight": return "Doprava"; case "FixedCarriage": return "Pevný válec (Středování)";
-                case "Theme": return "Vzhled"; case "Font": return "Písmo"; case "FontSize": return "Velikost písma"; case "Language": return "Jazyk";
-                case "Audio": return "Zvuky stroje"; case "SoundClack": return "Klapání kláves"; case "SoundBell": return "Cinknutí na konci řádku"; case "SoundReturn": return "Odřádkování";
+                case "File": return "Soubor"; case "New": return "Nový dokument..."; case "Open": return "Otevřít dokument..."; case "Save": return "Uložit jako .txt..."; case "Print": return "Vytisknout..."; case "Exit": return "Ukončit program";
+                case "View": return "Zobrazení"; case "Fullscreen": return "Celá obrazovka"; case "Focus": return "Režim soustředění";
+                case "Alignment": return "Zarovnání textu"; case "AlignLeft": return "Zarovnat doleva"; case "AlignCenter": return "Zarovnat na střed"; case "AlignRight": return "Zarovnat doprava"; case "FixedCarriage": return "Pevný válec (Středování stránky)";
+                case "Theme": return "Motiv"; case "Font": return "Písmo"; case "FontSize": return "Velikost písma"; case "Language": return "Jazyk rozhraní";
+                case "Audio": return "Zvuky stroje"; case "SoundClack": return "Klapání kláves"; case "SoundBell": return "Cinknutí na konci řádku"; case "SoundReturn": return "Odřádkování (Posun válce)"; case "SoundScroll": return "Otáčení válce (Skrollování)";
                 case "Mode": return "Režim:"; case "TabHint": return "--> Přepnout pomocí TAB"; case "Words": return "Počet slov: ";
                 case "Success": return "Úspěšně uloženo!"; case "Error": return "Chyba:";
-                case "HubTitle": return "Vyberte typ dokumentu"; case "ChangeType": return "Změnit typ dokumentu...";
+                case "HubTitle": return "Vyberte formát dokumentu"; case "ChangeType": return "Změnit formát dokumentu...";
                 case "Warning": return "Neuložené změny"; case "Unsaved": return "Máte neuložené změny. Chcete je před odchodem uložit?";
                 case "Screenplay": return "Filmový scénář"; case "Comic Book Script": return "Komiksový scénář"; case "Novel": return "Kniha / Román"; case "Stage Play": return "Divadelní hra"; case "Podcast / Audio Drama": return "Podcast / Audio hra";
                 case "Poetry": return "Poezie"; case "Article / Blog": return "Článek / Blog"; case "Short Story": return "Povídka"; case "Journal / Diary": return "Deník";
-                case "SCENE": return "OBRAZ"; case "ACTION": return "POPIS DĚJE"; case "CHARACTER": return "POSTAVA"; case "PARENTHETICAL": return "POZNÁMKA"; case "DIALOGUE": return "DIALOG"; case "TRANSITION": return "STŘIH"; case "PAGE_PANEL": return "STRANA / PANEL"; case "CAPTION": return "POPISEK"; case "CHAPTER": return "KAPITOLA"; case "PROSE": return "TEXT"; case "ACT_SCENE": return "DĚJSTVÍ / VÝSTUP"; case "STAGE_DIRECTION": return "SCÉNICKÁ POZNÁMKA"; case "SFX_MUSIC": return "ZVUK / HUDBA"; case "HOST_GUEST": return "MODERÁTOR / HOST";
+                case "SCENE": return "OBRAZ (MÍSTO DĚJE)"; case "ACTION": return "POPIS DĚJE"; case "CHARACTER": return "POSTAVA"; case "PARENTHETICAL": return "ZÁVORKA (POZNÁMKA)"; case "DIALOGUE": return "PROMLUVA (DIALOG)"; case "TRANSITION": return "STŘIH / PŘECHOD"; case "PAGE_PANEL": return "STRANA / PANEL"; case "CAPTION": return "POPISEK"; case "CHAPTER": return "KAPITOLA"; case "PROSE": return "TEXT"; case "ACT_SCENE": return "DĚJSTVÍ / VÝSTUP"; case "STAGE_DIRECTION": return "SCÉNICKÁ POZNÁMKA"; case "SFX_MUSIC": return "ZVUKOVÝ EFEKT / HUDBA"; case "HOST_GUEST": return "MODERÁTOR / HOST";
                 case "Dark": return "Tmavý"; case "Light": return "Světlý"; case "Parchment": return "Pergamen"; case "Vintage": return "Retro"; case "Blueprint": return "Technický výkres"; case "Dracula": return "Dracula"; case "Sunset": return "Západ slunce"; case "Ocean": return "Oceán"; case "Nord": return "Nord"; case "SolarizedDark": return "Solarized (Tmavý)"; case "SolarizedLight": return "Solarized (Světlý)"; case "Monokai": return "Monokai"; case "RosePine": return "Rosé Pine"; case "Coffee": return "Káva"; case "Sepia": return "Sépie"; case "Forest": return "Les"; case "Amethyst": return "Ametyst"; case "Hacker": return "Hacker";
             }
         } else if (current == Lang.GERMAN) {
@@ -25,7 +25,7 @@ public class Localization {
                 case "View": return "Ansicht"; case "Fullscreen": return "Vollbild"; case "Focus": return "Fokus-Modus";
                 case "Alignment": return "Textausrichtung"; case "AlignLeft": return "Links"; case "AlignCenter": return "Zentriert"; case "AlignRight": return "Rechts"; case "FixedCarriage": return "Fester Wagen (Zentrieren)";
                 case "Theme": return "Design"; case "Font": return "Schriftart"; case "FontSize": return "Schriftgröße"; case "Language": return "Sprache";
-                case "Audio": return "Audio"; case "SoundClack": return "Tastenklick"; case "SoundBell": return "Zeilenglocke"; case "SoundReturn": return "Wagenrücklauf";
+                case "Audio": return "Audio"; case "SoundClack": return "Tastenklick"; case "SoundBell": return "Zeilenglocke"; case "SoundReturn": return "Wagenrücklauf"; case "SoundScroll": return "Walzendrehung (Mausrad)";
                 case "Mode": return "Modus:"; case "TabHint": return "--> TAB zum Wechseln"; case "Words": return "Wörter: ";
                 case "Success": return "Erfolgreich!"; case "Error": return "Fehler:";
                 case "HubTitle": return "Dokumentformat wählen"; case "ChangeType": return "Format ändern...";
@@ -40,7 +40,7 @@ public class Localization {
                 case "View": return "Ver"; case "Fullscreen": return "Pantalla completa"; case "Focus": return "Modo enfoque";
                 case "Alignment": return "Alineación de texto"; case "AlignLeft": return "Izquierda"; case "AlignCenter": return "Centro"; case "AlignRight": return "Derecha"; case "FixedCarriage": return "Carro Fijo (Centrado)";
                 case "Theme": return "Tema"; case "Font": return "Fuente"; case "FontSize": return "Tamaño de fuente"; case "Language": return "Idioma";
-                case "Audio": return "Audio"; case "SoundClack": return "Clic de tecla"; case "SoundBell": return "Campana de margen"; case "SoundReturn": return "Retorno de carro";
+                case "Audio": return "Audio"; case "SoundClack": return "Clic de tecla"; case "SoundBell": return "Campana de margen"; case "SoundReturn": return "Retorno de carro"; case "SoundScroll": return "Rodillo (Rueda del ratón)";
                 case "Mode": return "Modo:"; case "TabHint": return "--> TAB para cambiar"; case "Words": return "Palabras: ";
                 case "Success": return "¡Éxito!"; case "Error": return "Error:";
                 case "HubTitle": return "Seleccionar formato"; case "ChangeType": return "Cambiar formato...";
@@ -55,7 +55,7 @@ public class Localization {
                 case "View": return "Affichage"; case "Fullscreen": return "Plein écran"; case "Focus": return "Mode concentration";
                 case "Alignment": return "Alignement du texte"; case "AlignLeft": return "Gauche"; case "AlignCenter": return "Centre"; case "AlignRight": return "Droite"; case "FixedCarriage": return "Chariot Fixe (Centrage)";
                 case "Theme": return "Thème"; case "Font": return "Police"; case "FontSize": return "Taille de police"; case "Language": return "Langue";
-                case "Audio": return "Audio"; case "SoundClack": return "Clic de touche"; case "SoundBell": return "Cloche de marge"; case "SoundReturn": return "Retour chariot";
+                case "Audio": return "Audio"; case "SoundClack": return "Clic de touche"; case "SoundBell": return "Cloche de marge"; case "SoundReturn": return "Retour chariot"; case "SoundScroll": return "Rouleau (Molette de souris)";
                 case "Mode": return "Mode:"; case "TabHint": return "--> TAB pour changer"; case "Words": return "Mots: ";
                 case "Success": return "Succès !"; case "Error": return "Erreur :";
                 case "HubTitle": return "Choisir le format"; case "ChangeType": return "Changer de format...";
@@ -72,7 +72,7 @@ public class Localization {
             case "View": return "View"; case "Fullscreen": return "Fullscreen"; case "Focus": return "Focus Mode";
             case "Alignment": return "Text Alignment"; case "AlignLeft": return "Left"; case "AlignCenter": return "Center"; case "AlignRight": return "Right"; case "FixedCarriage": return "Fixed Carriage (Centering)";
             case "Theme": return "Theme"; case "Font": return "Font"; case "FontSize": return "Font Size"; case "Language": return "Language";
-            case "Audio": return "Audio"; case "SoundClack": return "Keystroke Clack"; case "SoundBell": return "Margin Bell"; case "SoundReturn": return "Carriage Return";
+            case "Audio": return "Audio"; case "SoundClack": return "Keystroke Clack"; case "SoundBell": return "Margin Bell"; case "SoundReturn": return "Carriage Return"; case "SoundScroll": return "Platen Scroll (Mouse Wheel)";
             case "Mode": return "Mode:"; case "TabHint": return "--> Press TAB to switch"; case "Words": return "Words: ";
             case "Success": return "Success!"; case "Error": return "Error:";
             case "HubTitle": return "Select Document Format"; case "ChangeType": return "Change Format...";

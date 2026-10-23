@@ -13,7 +13,7 @@ import java.awt.print.PrinterJob;
 
 public class ScreenwriterUI extends JFrame {
     private JTextPane textPane;
-    private JScrollPane scrollPane; // Pulled out so the engine can manipulate the scrolling viewport
+    private JScrollPane scrollPane;
     private JLabel statusLabel, wordCountLabel;
     private JLabel focusToggleBtn, fullscreenToggleBtn;
     private JPanel statusPanel, rightStatusPanel;
@@ -27,12 +27,11 @@ public class ScreenwriterUI extends JFrame {
     private JMenuItem newItem, openItem, saveItem, printItem, changeTypeItem, exitMenuItem;
     private JMenuItem fullscreenItem, focusItem;
 
-    // New Typing Mechanics Menus
     private JMenu alignMenu;
     private JMenuItem leftAlign, centerAlign, rightAlign;
     private JCheckBoxMenuItem fixedCarriageToggle;
 
-    private JCheckBoxMenuItem clackToggle, bellToggle, returnToggle;
+    private JCheckBoxMenuItem clackToggle, bellToggle, returnToggle, scrollToggle;
 
     private JPopupMenu suggestionMenu;
     private String currentSuggestion = null;
@@ -82,6 +81,10 @@ public class ScreenwriterUI extends JFrame {
 
         scrollPane = new JScrollPane(textPane);
         scrollPane.setBorder(null);
+
+        // --- NEW: PLATEN SCROLL AUDIO EFFECT ---
+        scrollPane.addMouseWheelListener(e -> TypewriterSound.playScroll());
+
         add(scrollPane, BorderLayout.CENTER);
 
         statusPanel = new JPanel(new BorderLayout());
@@ -129,8 +132,6 @@ public class ScreenwriterUI extends JFrame {
 
         applyTheme();
         applyFont();
-
-        // Ensure the entire document respects the saved Global Alignment on startup
         changeAlignment(Main.globalAlignment);
         applyCurrentFormatting();
     }
@@ -181,7 +182,6 @@ public class ScreenwriterUI extends JFrame {
         fullscreenItem = new JMenuItem(); fullscreenItem.addActionListener(e -> toggleFullscreen());
         focusItem = new JMenuItem(); focusItem.addActionListener(e -> toggleFocusMode());
 
-        // --- TEXT ALIGNMENT & FIXED CARRIAGE MENUS ---
         alignMenu = new JMenu();
         leftAlign = new JMenuItem(); leftAlign.addActionListener(e -> changeAlignment(StyleConstants.ALIGN_LEFT));
         centerAlign = new JMenuItem(); centerAlign.addActionListener(e -> changeAlignment(StyleConstants.ALIGN_CENTER));
@@ -193,7 +193,7 @@ public class ScreenwriterUI extends JFrame {
         fixedCarriageToggle.addActionListener(e -> {
             Main.isFixedCarriage = fixedCarriageToggle.getState();
             Main.savePreferences();
-            centerCarriage(); // Immediately scroll the screen to center when toggled
+            centerCarriage();
         });
 
         viewMenu.add(fullscreenItem); viewMenu.add(focusItem); viewMenu.addSeparator();
@@ -226,11 +226,17 @@ public class ScreenwriterUI extends JFrame {
 
         clackToggle = new JCheckBoxMenuItem(); clackToggle.setState(TypewriterSound.isClackEnabled);
         clackToggle.addActionListener(e -> { TypewriterSound.isClackEnabled = clackToggle.getState(); Main.savePreferences(); });
+
         bellToggle = new JCheckBoxMenuItem(); bellToggle.setState(TypewriterSound.isBellEnabled);
         bellToggle.addActionListener(e -> { TypewriterSound.isBellEnabled = bellToggle.getState(); Main.savePreferences(); });
+
         returnToggle = new JCheckBoxMenuItem(); returnToggle.setState(TypewriterSound.isReturnEnabled);
         returnToggle.addActionListener(e -> { TypewriterSound.isReturnEnabled = returnToggle.getState(); Main.savePreferences(); });
-        audioMenu.add(clackToggle); audioMenu.add(bellToggle); audioMenu.add(returnToggle);
+
+        scrollToggle = new JCheckBoxMenuItem(); scrollToggle.setState(TypewriterSound.isScrollEnabled);
+        scrollToggle.addActionListener(e -> { TypewriterSound.isScrollEnabled = scrollToggle.getState(); Main.savePreferences(); });
+
+        audioMenu.add(clackToggle); audioMenu.add(bellToggle); audioMenu.add(returnToggle); audioMenu.add(scrollToggle);
 
         menuBar.add(fileMenu); menuBar.add(viewMenu); menuBar.add(themeMenu);
         menuBar.add(fontMenu); menuBar.add(sizeMenu); menuBar.add(audioMenu); menuBar.add(langMenu);
@@ -283,9 +289,6 @@ public class ScreenwriterUI extends JFrame {
         statusPanel.addMouseMotionListener(slideListener);
     }
 
-    // --- NEW: TYPEWRITER SIMULATION MECHANICS ---
-
-    // 1. Instantly forces alignment across the entire document
     private void changeAlignment(int alignment) {
         Main.globalAlignment = alignment;
         Main.savePreferences();
@@ -296,7 +299,6 @@ public class ScreenwriterUI extends JFrame {
         textPane.repaint();
     }
 
-    // 2. Mathematically calculates exact bounds to force the virtual paper to slide under the cursor
     private void centerCarriage() {
         if (Main.isFixedCarriage && scrollPane != null) {
             SwingUtilities.invokeLater(() -> {
@@ -310,7 +312,6 @@ public class ScreenwriterUI extends JFrame {
                     int viewX = Math.max(0, rect.x - (extentWidth / 2));
                     int viewY = Math.max(0, rect.y - (extentHeight / 2));
 
-                    // Cap bounds to ensure smooth scrolling
                     int maxX = Math.max(0, textPane.getWidth() - extentWidth);
                     int maxY = Math.max(0, textPane.getHeight() - extentHeight);
 
@@ -432,6 +433,7 @@ public class ScreenwriterUI extends JFrame {
         clackToggle.setText(Localization.get("SoundClack"));
         bellToggle.setText(Localization.get("SoundBell"));
         returnToggle.setText(Localization.get("SoundReturn"));
+        scrollToggle.setText(Localization.get("SoundScroll"));
 
         focusToggleBtn.setText(Localization.get("Focus"));
         fullscreenToggleBtn.setText(Localization.get("Fullscreen"));
@@ -529,8 +531,6 @@ public class ScreenwriterUI extends JFrame {
             javax.swing.text.Element p = doc.getCharacterElement(textPane.getCaretPosition()).getParentElement();
             String modeName = (String) p.getAttributes().getAttribute("ElementType");
             if (modeName != null) { try { currentMode = ElementType.valueOf(modeName); updateStatus(); } catch (Exception ignored) {} }
-
-            // Re-centers the viewport seamlessly while typing or clicking if Fixed Carriage is ON
             centerCarriage();
         });
 
@@ -627,10 +627,7 @@ public class ScreenwriterUI extends JFrame {
         SimpleAttributeSet attrs = new SimpleAttributeSet();
         StyleConstants.setLeftIndent(attrs, currentMode.getSwingIndent());
         StyleConstants.setFirstLineIndent(attrs, currentMode.getFirstLineIndent());
-
-        // Tells the engine to check memory and align the text correctly (Left, Center, or Right)
         StyleConstants.setAlignment(attrs, Main.globalAlignment);
-
         attrs.addAttribute("ElementType", currentMode.name());
         doc.setParagraphAttributes(textPane.getCaretPosition(), 0, attrs, false);
     }

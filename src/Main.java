@@ -9,7 +9,6 @@ public class Main {
     public static String globalFontName = "Courier New";
     public static int globalFontSize = 18;
 
-    // New Typing Mechanics Memory
     public static int globalAlignment = StyleConstants.ALIGN_LEFT;
     public static boolean isFixedCarriage = false;
 
@@ -33,6 +32,7 @@ public class Main {
         TypewriterSound.isClackEnabled = prefs.getBoolean("clack", true);
         TypewriterSound.isBellEnabled = prefs.getBoolean("bell", true);
         TypewriterSound.isReturnEnabled = prefs.getBoolean("return", true);
+        TypewriterSound.isScrollEnabled = prefs.getBoolean("scroll", true);
 
         globalAlignment = prefs.getInt("alignment", StyleConstants.ALIGN_LEFT);
         isFixedCarriage = prefs.getBoolean("fixedCarriage", false);
@@ -46,6 +46,7 @@ public class Main {
         prefs.putBoolean("clack", TypewriterSound.isClackEnabled);
         prefs.putBoolean("bell", TypewriterSound.isBellEnabled);
         prefs.putBoolean("return", TypewriterSound.isReturnEnabled);
+        prefs.putBoolean("scroll", TypewriterSound.isScrollEnabled);
 
         prefs.putInt("alignment", globalAlignment);
         prefs.putBoolean("fixedCarriage", isFixedCarriage);
@@ -64,29 +65,34 @@ public class Main {
 
     public static void showLauncher() {
         JDialog launcher = new JDialog((Frame)null, "TYPEWRITER", true);
-        launcher.setSize(850, 500);
+        launcher.setSize(850, 540);
         launcher.setLocationRelativeTo(null);
         launcher.setLayout(new BorderLayout());
         launcher.getContentPane().setBackground(globalTheme.bg);
 
-        JLabel title = new JLabel("TYPEWRITER", SwingConstants.CENTER);
-        title.setFont(new Font("Century Gothic", Font.BOLD, 28));
+        // --- STYLIZED LOGO ---
+        JLabel title = new JLabel("T Y P E W R I T E R", SwingConstants.CENTER);
+        title.setFont(new Font("Century Gothic", Font.BOLD, 32));
         title.setForeground(globalTheme.fg);
+        title.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(2, 0, 2, 0, globalTheme.accent),
+                BorderFactory.createEmptyBorder(10, 0, 10, 0)
+        ));
 
         JLabel subtitle = new JLabel(Localization.get("HubTitle"), SwingConstants.CENTER);
         subtitle.setFont(new Font("Century Gothic", Font.PLAIN, 15));
         subtitle.setForeground(globalTheme.accent);
 
-        JPanel headerPanel = new JPanel(new GridLayout(2, 1));
+        JPanel headerPanel = new JPanel(new GridLayout(2, 1, 0, 10));
         headerPanel.setOpaque(false);
-        headerPanel.setBorder(BorderFactory.createEmptyBorder(40, 0, 30, 0));
+        headerPanel.setBorder(BorderFactory.createEmptyBorder(30, 80, 20, 80));
         headerPanel.add(title);
         headerPanel.add(subtitle);
         launcher.add(headerPanel, BorderLayout.NORTH);
 
         JPanel buttonPanel = new JPanel(new GridLayout(3, 3, 15, 15));
         buttonPanel.setOpaque(false);
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(0, 40, 50, 40));
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(0, 40, 20, 40));
 
         for (DocumentType type : DocumentType.values()) {
             JButton btn = new JButton(Localization.get(type.langKey));
@@ -110,8 +116,16 @@ public class Main {
             });
             buttonPanel.add(btn);
         }
-
         launcher.add(buttonPanel, BorderLayout.CENTER);
+
+        // --- COPYRIGHT NOTICE ---
+        JLabel copyright = new JLabel("© 2026 Alex Paukert. All rights reserved.", SwingConstants.CENTER);
+        copyright.setFont(new Font("Century Gothic", Font.PLAIN, 11));
+        Color c = globalTheme.fg;
+        copyright.setForeground(new Color(c.getRed(), c.getGreen(), c.getBlue(), 120)); // Semi-transparent
+        copyright.setBorder(BorderFactory.createEmptyBorder(0, 0, 15, 0));
+        launcher.add(copyright, BorderLayout.SOUTH);
+
         launcher.setVisible(true);
     }
 }
