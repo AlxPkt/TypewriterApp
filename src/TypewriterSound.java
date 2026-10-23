@@ -7,18 +7,42 @@ public class TypewriterSound {
     static {
         try {
             AudioFormat format = new AudioFormat(44100, 8, 1, true, false);
-            byte[] clickData = new byte[1500];
-            for (int i = 0; i < clickData.length; i++) clickData[i] = (byte) ((Math.random() * 255 - 128) * Math.exp(-i / 200.0));
+
+            // 1. Premium "Thock" (Deep, resonant mechanical switch)
+            byte[] clickData = new byte[2500];
+            for (int i = 0; i < clickData.length; i++) {
+                double t = i / 44100.0;
+                double noise = (Math.random() * 2.0 - 1.0);
+                double clickTransient = noise * Math.exp(-t * 1200.0); // Faster, sharper high-end snap
+                double woodResonance = Math.sin(t * 300 * Math.PI * 2) * Math.exp(-t * 200.0); // Deeper, warmer low-end thud
+                clickData[i] = (byte) ((clickTransient * 0.4 + woodResonance * 0.6) * 45);
+            }
             clickClip = AudioSystem.getClip(); clickClip.open(format, clickData, 0, clickData.length);
 
-            byte[] bellData = new byte[22000];
-            for (int i = 0; i < bellData.length; i++) bellData[i] = (byte) ((Math.sin(i * 0.4) * 0.6 + Math.sin(i * 0.6) * 0.4) * 127 * Math.exp(-i / 4000.0));
+            // 2. Crystal Clear Bell (Higher pitch, softer volume)
+            byte[] bellData = new byte[44100];
+            for (int i = 0; i < bellData.length; i++) {
+                double t = i / 44100.0;
+                double env = Math.exp(-t * 3.5);
+                double wave = Math.sin(t * 1600 * Math.PI * 2) * 1.0
+                        + Math.sin(t * 2400 * Math.PI * 2) * 0.4;
+                bellData[i] = (byte) (wave * 20 * env); // Lower volume (20) so it isn't piercing
+            }
             bellClip = AudioSystem.getClip(); bellClip.open(format, bellData, 0, bellData.length);
 
-            byte[] returnData = new byte[22000];
+            // 3. Tactile Carriage Return (Slower zipper, heavy stop)
+            byte[] returnData = new byte[28000];
             for (int i = 0; i < returnData.length; i++) {
-                if (i < 18000) returnData[i] = (byte) ((Math.random() * 60 - 30) * Math.exp(-i / 10000.0));
-                else { int t = i - 18000; returnData[i] = (byte) (Math.sin(t / 10.0) * 127 * Math.exp(-t / 800.0)); }
+                double t = i / 44100.0;
+                if (i < 22000) {
+                    double noise = (Math.random() * 2.0 - 1.0);
+                    double ratchet = Math.abs(Math.sin(t * 120 * Math.PI * 2)); // Slower, thicker ratchet clicks
+                    returnData[i] = (byte) (noise * ratchet * 25 * Math.exp(-t * 2.0));
+                } else {
+                    double lockTime = (i - 22000) / 44100.0;
+                    double thump = Math.sin(lockTime * 60 * Math.PI * 2) * Math.exp(-lockTime * 60.0);
+                    returnData[i] = (byte) (thump * 55);
+                }
             }
             returnClip = AudioSystem.getClip(); returnClip.open(format, returnData, 0, returnData.length);
         } catch (Exception e) {}
