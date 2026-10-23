@@ -1,6 +1,10 @@
-import javax.swing.text.StyledDocument;
+import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 import java.io.FileWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
 
 public class FileManager {
     public static void saveToTxt(StyledDocument doc, String filepath) throws Exception {
@@ -26,6 +30,36 @@ public class FileManager {
                 for (int s = 0; s < spaces; s++) fw.write(" ");
                 fw.write(text);
             }
+        }
+    }
+
+    public static void openFromTxt(StyledDocument doc, String filepath) throws Exception {
+        doc.remove(0, doc.getLength()); // Clear current document
+        List<String> lines = Files.readAllLines(Paths.get(filepath));
+
+        for (String line : lines) {
+            int spaceCount = 0;
+            while (spaceCount < line.length() && line.charAt(spaceCount) == ' ') {
+                spaceCount++;
+            }
+
+            ElementType matchedType = ElementType.ACTION; // Default fallback
+            for (ElementType type : ElementType.values()) {
+                // Approximate match for spaces to handle slight formatting differences
+                if (Math.abs(type.getTxtSpaces() - spaceCount) <= 2 && spaceCount > 0) {
+                    matchedType = type;
+                    break;
+                }
+            }
+
+            String text = line.substring(spaceCount);
+            SimpleAttributeSet attrs = new SimpleAttributeSet();
+            StyleConstants.setLeftIndent(attrs, matchedType.getSwingIndent());
+            attrs.addAttribute("ElementType", matchedType.name());
+
+            int len = doc.getLength();
+            doc.insertString(len, text + "\n", attrs);
+            doc.setParagraphAttributes(len, text.length() + 1, attrs, false);
         }
     }
 }

@@ -9,7 +9,7 @@ public enum Theme {
     CHALKBOARD(new Color(35, 55, 45), new Color(245, 245, 235), new Color(25, 40, 30), new Color(255, 200, 100), new Color(100, 150, 120), 20, "Chalkboard");
 
     public final Color bg, fg, statusBg, accent, marginColor;
-    public final int noiseAlpha; // How visible the paper grain texture is
+    public final int noiseAlpha;
     public final String langKey;
 
     Theme(Color bg, Color fg, Color statusBg, Color accent, Color marginColor, int noiseAlpha, String langKey) {

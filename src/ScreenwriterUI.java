@@ -12,7 +12,6 @@ public class ScreenwriterUI extends JFrame {
     private JPanel statusPanel;
     private JMenuBar menuBar;
 
-    // Menus
     private JMenu fileMenu, settingsMenu, viewMenu, themeMenu, fontMenu, sizeMenu, langMenu, marginMenu, audioMenu;
     private JMenuItem newItem, openItem, saveItem, exportItem, printItem, exitMenuItem;
     private JMenuItem fullscreenItem, focusItem;
@@ -20,7 +19,7 @@ public class ScreenwriterUI extends JFrame {
     private JButton dedicatedExitButton;
 
     private ElementType currentMode = ElementType.SCENE_HEADING;
-    private Theme currentTheme = Theme.VINTAGE; // Starts with the new Vintage theme
+    private Theme currentTheme = Theme.VINTAGE;
     private TexturePaint paperTexture;
 
     private String currentFontName = "Courier New";
@@ -37,14 +36,12 @@ public class ScreenwriterUI extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // Custom JTextPane that draws Texture and Physical Margins
         textPane = new JTextPane() {
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2d = (Graphics2D) g;
                 g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
-                // Draw Paper Texture Background
                 if (paperTexture != null) {
                     g2d.setPaint(paperTexture);
                     g2d.fillRect(0, 0, getWidth(), getHeight());
@@ -53,16 +50,16 @@ public class ScreenwriterUI extends JFrame {
                     g2d.fillRect(0, 0, getWidth(), getHeight());
                 }
 
-                // Draw Physical Margin Lines
+                // Draw physical lines with a 15px visual buffer OUTSIDE the text bounding box
                 g2d.setColor(currentTheme.marginColor);
                 g2d.setStroke(new BasicStroke(1));
-                g2d.drawLine(currentMargin - 10, 0, currentMargin - 10, getHeight()); // Left Margin Line
-                g2d.drawLine(getWidth() - currentMargin + 10, 0, getWidth() - currentMargin + 10, getHeight()); // Right Margin
+                g2d.drawLine(currentMargin - 15, 0, currentMargin - 15, getHeight());
+                g2d.drawLine(getWidth() - currentMargin + 15, 0, getWidth() - currentMargin + 15, getHeight());
 
                 super.paintComponent(g);
             }
         };
-        textPane.setOpaque(false); // Make transparent so custom background paints behind text
+        textPane.setOpaque(false);
         applyMargins();
 
         JScrollPane scrollPane = new JScrollPane(textPane);
@@ -90,7 +87,6 @@ public class ScreenwriterUI extends JFrame {
     }
 
     private void generateTexture() {
-        // Generates a seamless 128x128 noise pattern for the paper texture
         BufferedImage img = new BufferedImage(128, 128, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = img.createGraphics();
         g.setColor(currentTheme.bg);
@@ -104,7 +100,6 @@ public class ScreenwriterUI extends JFrame {
     }
 
     private void applyMargins() {
-        // Enforces text strictly within margins
         textPane.setBorder(BorderFactory.createEmptyBorder(60, currentMargin, 60, currentMargin));
     }
 
@@ -113,14 +108,17 @@ public class ScreenwriterUI extends JFrame {
         menuBar.setBorderPainted(false);
         fileMenu = new JMenu(); settingsMenu = new JMenu();
 
-        // FILE MENU
         newItem = new JMenuItem();
         newItem.addActionListener(e -> { textPane.setText(""); wordCount = 0; updateStatus(); });
-        openItem = new JMenuItem(); // Placeholder
+
+        openItem = new JMenuItem();
+        openItem.addActionListener(e -> openFile());
+
         saveItem = new JMenuItem();
         saveItem.addActionListener(e -> saveFile());
-        exportItem = new JMenuItem(); exportItem.setEnabled(false); // Placeholder
-        printItem = new JMenuItem(); printItem.setEnabled(false); // Placeholder
+
+        exportItem = new JMenuItem(); exportItem.setEnabled(false);
+        printItem = new JMenuItem(); printItem.setEnabled(false);
         exitMenuItem = new JMenuItem();
         exitMenuItem.addActionListener(e -> System.exit(0));
 
@@ -128,7 +126,6 @@ public class ScreenwriterUI extends JFrame {
         fileMenu.add(saveItem); fileMenu.add(exportItem); fileMenu.add(printItem); fileMenu.addSeparator();
         fileMenu.add(exitMenuItem);
 
-        // SETTINGS -> VIEW
         viewMenu = new JMenu();
         fullscreenItem = new JMenuItem();
         fullscreenItem.addActionListener(e -> toggleFullscreen());
@@ -136,7 +133,6 @@ public class ScreenwriterUI extends JFrame {
         focusItem.addActionListener(e -> toggleFocusMode());
         viewMenu.add(fullscreenItem); viewMenu.add(focusItem);
 
-        // SETTINGS -> VARIOUS
         themeMenu = new JMenu();
         for (Theme t : Theme.values()) {
             JMenuItem item = new JMenuItem();
@@ -161,7 +157,7 @@ public class ScreenwriterUI extends JFrame {
 
         marginMenu = new JMenu();
         for (int m : new int[]{80, 150, 250}) {
-            JMenuItem item = new JMenuItem(); // Names applied in updateLanguage
+            JMenuItem item = new JMenuItem();
             item.addActionListener(e -> { currentMargin = m; applyMargins(); textPane.repaint(); });
             marginMenu.add(item);
         }
@@ -263,6 +259,18 @@ public class ScreenwriterUI extends JFrame {
         wordCountLabel.setText(Localization.get("Words") + wordCount);
     }
 
+    private void openFile() {
+        JFileChooser chooser = new JFileChooser();
+        if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            try {
+                FileManager.openFromTxt(textPane.getStyledDocument(), chooser.getSelectedFile().getAbsolutePath());
+                wordCountLabel.setText(Localization.get("Words") + textPane.getText().split("\\s+").length);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, Localization.get("Error") + ex.getMessage());
+            }
+        }
+    }
+
     private void saveFile() {
         JFileChooser chooser = new JFileChooser();
         if (chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
@@ -311,7 +319,6 @@ public class ScreenwriterUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 textPane.replaceSelection("\n"); currentMode = currentMode.getSmartNext();
                 applyCurrentFormatting(); updateStatus();
-                // Play Carriage Return Sound on Enter
                 TypewriterSound.playReturn();
             }
         });
@@ -319,26 +326,39 @@ public class ScreenwriterUI extends JFrame {
 
     private void setupDocumentFilter() {
         ((AbstractDocument) textPane.getDocument()).setDocumentFilter(new DocumentFilter() {
-            public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
-                if (currentMode.isAutoCapitalize() && string != null) string = string.toUpperCase();
-                super.insertString(fb, offset, string, attr);
-                TypewriterSound.playClick(); checkBellRing(fb, offset, string);
-            }
-            public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
-                if (currentMode.isAutoCapitalize() && text != null) text = text.toUpperCase();
-                super.replace(fb, offset, length, text, attrs);
-                if (text != null && text.length() == 1) {
-                    TypewriterSound.playClick(); checkBellRing(fb, offset, text);
+            private boolean processHardStop(FilterBypass fb, int offset, String textToInsert) throws BadLocationException {
+                if (textToInsert.contains("\n")) return true; // Always allow Enter key
+
+                javax.swing.text.Element p = ((StyledDocument)fb.getDocument()).getParagraphElement(offset);
+                int currentLength = p.getEndOffset() - p.getStartOffset() - 1; // Exclude \n
+                int newLength = currentLength + textToInsert.length();
+
+                if (newLength > currentMode.getMaxChars()) {
+                    return false; // Hard Carriage Lock! Block typing.
                 }
-            }
-            public void remove(FilterBypass fb, int offset, int length) throws BadLocationException {
-                super.remove(fb, offset, length); TypewriterSound.playClick();
+
+                if (newLength == currentMode.getMaxChars() - 10) {
+                    TypewriterSound.playBell();
+                }
+                return true;
             }
 
-            private void checkBellRing(FilterBypass fb, int offset, String input) {
-                javax.swing.text.Element p = ((StyledDocument)fb.getDocument()).getParagraphElement(offset);
-                int lineLength = (offset + input.length()) - p.getStartOffset();
-                if (lineLength == 55) { TypewriterSound.playBell(); }
+            public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
+                if (!processHardStop(fb, offset, string)) return;
+                if (currentMode.isAutoCapitalize() && string != null) string = string.toUpperCase();
+                super.insertString(fb, offset, string, attr);
+                TypewriterSound.playClick();
+            }
+
+            public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
+                if (text != null && !processHardStop(fb, offset, text)) return;
+                if (currentMode.isAutoCapitalize() && text != null) text = text.toUpperCase();
+                super.replace(fb, offset, length, text, attrs);
+                if (text != null && text.length() == 1) TypewriterSound.playClick();
+            }
+
+            public void remove(FilterBypass fb, int offset, int length) throws BadLocationException {
+                super.remove(fb, offset, length); TypewriterSound.playClick();
             }
         });
     }
