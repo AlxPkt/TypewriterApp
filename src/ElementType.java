@@ -1,79 +1,104 @@
-import java.util.ArrayList;
-import java.util.List;
-
 public enum ElementType {
-    // SCREENPLAY FORMAT
-    SCENE_HEADING(DocumentType.SCREENPLAY, 0, 0, 0, true, "SCENE", 60),
-    ACTION(DocumentType.SCREENPLAY, 0, 0, 0, false, "ACTION", 60),
-    CHARACTER(DocumentType.SCREENPLAY, 150, 0, 22, true, "CHARACTER", 35),
-    PARENTHETICAL(DocumentType.SCREENPLAY, 100, 0, 16, false, "PARENTHETICAL", 20),
-    DIALOGUE(DocumentType.SCREENPLAY, 50, 0, 10, false, "DIALOGUE", 35),
-    TRANSITION(DocumentType.SCREENPLAY, 200, 0, 45, true, "TRANSITION", 20),
+    // Format: langKey, maxChars, firstLineIndent, swingIndent, txtSpaces, autoCapitalize
+    SCENE_HEADING("SCENE", 65, 0, 0, 0, true),
+    ACTION("ACTION", 65, 0, 0, 0, false),
+    CHARACTER("CHARACTER", 35, 150, 150, 22, true),
+    PARENTHETICAL("PARENTHETICAL", 25, 110, 110, 16, false),
+    DIALOGUE("DIALOGUE", 35, 80, 80, 10, false),
+    TRANSITION("TRANSITION", 20, 400, 400, 45, true),
 
-    // COMIC BOOK FORMAT
-    PAGE_PANEL(DocumentType.COMIC_BOOK, 0, 0, 0, true, "PAGE_PANEL", 60),
-    COMIC_ACTION(DocumentType.COMIC_BOOK, 0, 0, 0, false, "ACTION", 60),
-    COMIC_CHARACTER(DocumentType.COMIC_BOOK, 100, 0, 15, true, "CHARACTER", 35),
-    COMIC_DIALOGUE(DocumentType.COMIC_BOOK, 50, 0, 8, false, "DIALOGUE", 40),
-    CAPTION(DocumentType.COMIC_BOOK, 150, 0, 22, false, "CAPTION", 35),
+    PAGE_PANEL("PAGE_PANEL", 65, 0, 0, 0, true),
+    CAPTION("CAPTION", 35, 80, 80, 10, false),
 
-    // NOVEL FORMAT
-    CHAPTER_HEADING(DocumentType.NOVEL, 0, 0, 0, false, "CHAPTER", 50),
-    PROSE(DocumentType.NOVEL, 0, 30, 0, false, "PROSE", 85),
+    CHAPTER_HEADING("CHAPTER", 65, 0, 0, 0, true),
+    PROSE("PROSE", 65, 40, 0, 0, false),
 
-    // STAGE PLAY FORMAT
-    ACT_SCENE(DocumentType.STAGE_PLAY, 0, 0, 0, true, "ACT_SCENE", 60),
-    STAGE_ACTION(DocumentType.STAGE_PLAY, 0, 0, 0, false, "ACTION", 60),
-    STAGE_CHARACTER(DocumentType.STAGE_PLAY, 150, 0, 22, true, "CHARACTER", 35),
-    STAGE_DIALOGUE(DocumentType.STAGE_PLAY, 50, 0, 10, false, "DIALOGUE", 45),
-    STAGE_DIRECTION(DocumentType.STAGE_PLAY, 100, 0, 16, false, "STAGE_DIRECTION", 30),
+    ACT_SCENE("ACT_SCENE", 65, 200, 200, 25, true),
+    STAGE_DIRECTION("STAGE_DIRECTION", 45, 100, 100, 15, false),
 
-    // PODCAST / AUDIO DRAMA FORMAT
-    AUDIO_SCENE(DocumentType.PODCAST, 0, 0, 0, true, "SCENE", 60),
-    SFX_MUSIC(DocumentType.PODCAST, 0, 0, 0, true, "SFX_MUSIC", 60),
-    HOST_GUEST(DocumentType.PODCAST, 150, 0, 22, true, "HOST_GUEST", 35),
-    POD_DIALOGUE(DocumentType.PODCAST, 50, 0, 10, false, "DIALOGUE", 45);
+    AUDIO_SCENE("SFX_MUSIC", 65, 0, 0, 0, true),
+    HOST_GUEST("HOST_GUEST", 35, 150, 150, 22, true);
 
-    private final DocumentType docType;
-    private final int swingIndent, firstLineIndent, txtSpaces, maxChars;
-    private final boolean autoCapitalize;
     private final String langKey;
+    private final int maxChars, firstLineIndent, swingIndent, txtSpaces;
+    private final boolean autoCapitalize;
 
-    ElementType(DocumentType docType, int swingIndent, int firstLineIndent, int txtSpaces, boolean autoCapitalize, String langKey, int maxChars) {
-        this.docType = docType; this.swingIndent = swingIndent; this.firstLineIndent = firstLineIndent;
-        this.txtSpaces = txtSpaces; this.autoCapitalize = autoCapitalize; this.langKey = langKey; this.maxChars = maxChars;
+    ElementType(String langKey, int maxChars, int firstLineIndent, int swingIndent, int txtSpaces, boolean autoCapitalize) {
+        this.langKey = langKey;
+        this.maxChars = maxChars;
+        this.firstLineIndent = firstLineIndent;
+        this.swingIndent = swingIndent;
+        this.txtSpaces = txtSpaces;
+        this.autoCapitalize = autoCapitalize;
     }
 
-    public DocumentType getDocType() { return docType; }
-    public int getSwingIndent() { return swingIndent; }
+    public String getLabel() { return Localization.get(langKey); }
+    public int getMaxChars() { return maxChars; }
     public int getFirstLineIndent() { return firstLineIndent; }
+    public int getSwingIndent() { return swingIndent; }
     public int getTxtSpaces() { return txtSpaces; }
     public boolean isAutoCapitalize() { return autoCapitalize; }
-    public int getMaxChars() { return maxChars; }
-    public String getLabel() { return Localization.get(langKey); }
 
+    // Maps the correct formatting elements to the Document Type you chose in the Hub
     public static ElementType[] getValuesFor(DocumentType type) {
-        List<ElementType> list = new ArrayList<>();
-        for (ElementType e : values()) { if (e.docType == type) list.add(e); }
-        return list.toArray(new ElementType[0]);
-    }
-
-    public ElementType next() {
-        ElementType[] valid = getValuesFor(this.docType);
-        for (int i = 0; i < valid.length; i++) {
-            if (valid[i] == this) return valid[(i + 1) % valid.length];
+        switch (type) {
+            case SCREENPLAY: return new ElementType[]{SCENE_HEADING, ACTION, CHARACTER, PARENTHETICAL, DIALOGUE, TRANSITION};
+            case COMIC_BOOK: return new ElementType[]{PAGE_PANEL, SCENE_HEADING, ACTION, CHARACTER, PARENTHETICAL, DIALOGUE, CAPTION};
+            case STAGE_PLAY: return new ElementType[]{ACT_SCENE, STAGE_DIRECTION, CHARACTER, DIALOGUE};
+            case PODCAST: return new ElementType[]{AUDIO_SCENE, ACTION, HOST_GUEST, DIALOGUE};
+            case NOVEL:
+            case POETRY:
+            case ARTICLE:
+            case SHORT_STORY:
+            case JOURNAL:
+            default:
+                return new ElementType[]{CHAPTER_HEADING, PROSE};
         }
-        return valid[0];
     }
 
+    // Handles the cycle when you press TAB
+    public ElementType next() {
+        switch(this) {
+            case SCENE_HEADING: return ACTION;
+            case ACTION: return CHARACTER;
+            case CHARACTER: return PARENTHETICAL;
+            case PARENTHETICAL: return DIALOGUE;
+            case DIALOGUE: return TRANSITION;
+            case TRANSITION: return SCENE_HEADING;
+
+            case PAGE_PANEL: return SCENE_HEADING;
+            case CAPTION: return ACTION;
+
+            case CHAPTER_HEADING: return PROSE;
+            case PROSE: return CHAPTER_HEADING;
+
+            case ACT_SCENE: return STAGE_DIRECTION;
+            case STAGE_DIRECTION: return CHARACTER;
+
+            case AUDIO_SCENE: return ACTION;
+            case HOST_GUEST: return DIALOGUE;
+
+            default: return PROSE;
+        }
+    }
+
+    // Handles the predictive logic when you press ENTER
     public ElementType getSmartNext() {
-        if (this == CHARACTER) return DIALOGUE;
-        if (this == SCENE_HEADING) return ACTION;
-        if (this == COMIC_CHARACTER) return COMIC_DIALOGUE;
-        if (this == PAGE_PANEL) return COMIC_ACTION;
-        if (this == CHAPTER_HEADING) return PROSE;
-        if (this == STAGE_CHARACTER) return STAGE_DIALOGUE;
-        if (this == HOST_GUEST) return POD_DIALOGUE;
-        return this;
+        switch(this) {
+            case SCENE_HEADING: return ACTION;
+            case CHARACTER: return DIALOGUE;
+            case PARENTHETICAL: return DIALOGUE;
+            case DIALOGUE: return ACTION;
+            case TRANSITION: return SCENE_HEADING;
+            case CHAPTER_HEADING: return PROSE;
+            case PROSE: return PROSE;
+            case PAGE_PANEL: return ACTION;
+            case CAPTION: return ACTION;
+            case ACT_SCENE: return STAGE_DIRECTION;
+            case STAGE_DIRECTION: return DIALOGUE;
+            case AUDIO_SCENE: return ACTION;
+            case HOST_GUEST: return DIALOGUE;
+            default: return ACTION;
+        }
     }
 }

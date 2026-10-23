@@ -1,18 +1,54 @@
 import javax.swing.*;
+import javax.swing.text.StyleConstants;
 import java.awt.*;
 import java.util.Enumeration;
+import java.util.prefs.Preferences;
 
 public class Main {
-    // Globally remembers your theme across the entire application
     public static Theme globalTheme = Theme.DARK;
+    public static String globalFontName = "Courier New";
+    public static int globalFontSize = 18;
+
+    // New Typing Mechanics Memory
+    public static int globalAlignment = StyleConstants.ALIGN_LEFT;
+    public static boolean isFixedCarriage = false;
+
+    public static Preferences prefs = Preferences.userNodeForPackage(Main.class);
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            Font modernUIFont = new Font("Segoe UI", Font.PLAIN, 13);
-            setUIFont(new javax.swing.plaf.FontUIResource(modernUIFont));
+        loadPreferences();
 
+        SwingUtilities.invokeLater(() -> {
+            Font popFont = new Font("Century Gothic", Font.BOLD, 14);
+            setUIFont(new javax.swing.plaf.FontUIResource(popFont));
             showLauncher();
         });
+    }
+
+    public static void loadPreferences() {
+        try { globalTheme = Theme.valueOf(prefs.get("theme", "DARK")); } catch(Exception e) {}
+        try { Localization.current = Localization.Lang.valueOf(prefs.get("lang", "ENGLISH")); } catch(Exception e) {}
+        globalFontName = prefs.get("fontName", "Courier New");
+        globalFontSize = prefs.getInt("fontSize", 18);
+        TypewriterSound.isClackEnabled = prefs.getBoolean("clack", true);
+        TypewriterSound.isBellEnabled = prefs.getBoolean("bell", true);
+        TypewriterSound.isReturnEnabled = prefs.getBoolean("return", true);
+
+        globalAlignment = prefs.getInt("alignment", StyleConstants.ALIGN_LEFT);
+        isFixedCarriage = prefs.getBoolean("fixedCarriage", false);
+    }
+
+    public static void savePreferences() {
+        prefs.put("theme", globalTheme.name());
+        prefs.put("lang", Localization.current.name());
+        prefs.put("fontName", globalFontName);
+        prefs.putInt("fontSize", globalFontSize);
+        prefs.putBoolean("clack", TypewriterSound.isClackEnabled);
+        prefs.putBoolean("bell", TypewriterSound.isBellEnabled);
+        prefs.putBoolean("return", TypewriterSound.isReturnEnabled);
+
+        prefs.putInt("alignment", globalAlignment);
+        prefs.putBoolean("fixedCarriage", isFixedCarriage);
     }
 
     private static void setUIFont(javax.swing.plaf.FontUIResource f) {
@@ -28,26 +64,33 @@ public class Main {
 
     public static void showLauncher() {
         JDialog launcher = new JDialog((Frame)null, "TYPEWRITER", true);
-        launcher.setSize(650, 400);
+        launcher.setSize(850, 500);
         launcher.setLocationRelativeTo(null);
         launcher.setLayout(new BorderLayout());
-
-        // Use global memory to instantly style the Hub
         launcher.getContentPane().setBackground(globalTheme.bg);
 
-        JLabel title = new JLabel(Localization.get("HubTitle"), SwingConstants.CENTER);
-        title.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        JLabel title = new JLabel("TYPEWRITER", SwingConstants.CENTER);
+        title.setFont(new Font("Century Gothic", Font.BOLD, 28));
         title.setForeground(globalTheme.fg);
-        title.setBorder(BorderFactory.createEmptyBorder(50, 0, 40, 0));
-        launcher.add(title, BorderLayout.NORTH);
 
-        JPanel buttonPanel = new JPanel(new GridLayout(2, 3, 15, 15));
+        JLabel subtitle = new JLabel(Localization.get("HubTitle"), SwingConstants.CENTER);
+        subtitle.setFont(new Font("Century Gothic", Font.PLAIN, 15));
+        subtitle.setForeground(globalTheme.accent);
+
+        JPanel headerPanel = new JPanel(new GridLayout(2, 1));
+        headerPanel.setOpaque(false);
+        headerPanel.setBorder(BorderFactory.createEmptyBorder(40, 0, 30, 0));
+        headerPanel.add(title);
+        headerPanel.add(subtitle);
+        launcher.add(headerPanel, BorderLayout.NORTH);
+
+        JPanel buttonPanel = new JPanel(new GridLayout(3, 3, 15, 15));
         buttonPanel.setOpaque(false);
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(0, 40, 60, 40));
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(0, 40, 50, 40));
 
         for (DocumentType type : DocumentType.values()) {
             JButton btn = new JButton(Localization.get(type.langKey));
-            btn.setFont(new Font("Segoe UI", Font.BOLD, 13));
+            btn.setFont(new Font("Century Gothic", Font.BOLD, 13));
             btn.setFocusPainted(false);
             btn.setBackground(globalTheme.statusBg);
             btn.setForeground(globalTheme.accent);

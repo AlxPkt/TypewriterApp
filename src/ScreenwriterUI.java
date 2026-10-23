@@ -1,23 +1,37 @@
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.awt.print.PrinterJob;
 
 public class ScreenwriterUI extends JFrame {
     private JTextPane textPane;
+    private JScrollPane scrollPane; // Pulled out so the engine can manipulate the scrolling viewport
     private JLabel statusLabel, wordCountLabel;
     private JLabel focusToggleBtn, fullscreenToggleBtn;
     private JPanel statusPanel, rightStatusPanel;
-    private JMenuBar menuBar;
 
-    private JMenu fileMenu, settingsMenu, viewMenu, themeMenu, fontMenu, sizeMenu, langMenu, audioMenu;
+    private JPanel topMenuContainer;
+    private JMenuBar menuBar;
+    private Timer menuAnimator;
+    private boolean isMenuShowing = true;
+
+    private JMenu fileMenu, viewMenu, themeMenu, fontMenu, sizeMenu, langMenu, audioMenu;
     private JMenuItem newItem, openItem, saveItem, printItem, changeTypeItem, exitMenuItem;
     private JMenuItem fullscreenItem, focusItem;
+
+    // New Typing Mechanics Menus
+    private JMenu alignMenu;
+    private JMenuItem leftAlign, centerAlign, rightAlign;
+    private JCheckBoxMenuItem fixedCarriageToggle;
+
     private JCheckBoxMenuItem clackToggle, bellToggle, returnToggle;
 
     private JPopupMenu suggestionMenu;
@@ -27,10 +41,7 @@ public class ScreenwriterUI extends JFrame {
     private ElementType currentMode;
     private TexturePaint paperTexture;
 
-    private String currentFontName = "Courier New";
-    private int currentFontSize = 18;
     private int wordCount = 0;
-
     private boolean isFullscreen = false;
     private boolean isFocusMode = false;
 
@@ -69,7 +80,7 @@ public class ScreenwriterUI extends JFrame {
         textPane.setOpaque(false);
         textPane.setBorder(BorderFactory.createEmptyBorder(60, 120, 60, 120));
 
-        JScrollPane scrollPane = new JScrollPane(textPane);
+        scrollPane = new JScrollPane(textPane);
         scrollPane.setBorder(null);
         add(scrollPane, BorderLayout.CENTER);
 
@@ -77,23 +88,31 @@ public class ScreenwriterUI extends JFrame {
         statusPanel.setBorder(BorderFactory.createEmptyBorder(8, 20, 8, 20));
 
         statusLabel = new JLabel();
-        statusLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        statusLabel.setFont(new Font("Century Gothic", Font.BOLD, 13));
         statusPanel.add(statusLabel, BorderLayout.WEST);
 
         rightStatusPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 0));
         rightStatusPanel.setOpaque(false);
 
         wordCountLabel = new JLabel();
-        wordCountLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        wordCountLabel.setFont(new Font("Century Gothic", Font.BOLD, 13));
 
-        focusToggleBtn = createStatusButton("Focus");
-        focusToggleBtn.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) { toggleFocusMode(); }
+        focusToggleBtn = new JLabel(Localization.get("Focus"));
+        focusToggleBtn.setFont(new Font("Century Gothic", Font.BOLD, 13));
+        focusToggleBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        focusToggleBtn.addMouseListener(new MouseAdapter() {
+            public void mouseEntered(MouseEvent evt) { focusToggleBtn.setForeground(Main.globalTheme.accent); }
+            public void mouseExited(MouseEvent evt) { focusToggleBtn.setForeground(isFocusMode ? Main.globalTheme.accent : Main.globalTheme.fg); }
+            public void mouseClicked(MouseEvent evt) { toggleFocusMode(); }
         });
 
-        fullscreenToggleBtn = createStatusButton("Fullscreen");
-        fullscreenToggleBtn.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) { toggleFullscreen(); }
+        fullscreenToggleBtn = new JLabel(Localization.get("Fullscreen"));
+        fullscreenToggleBtn.setFont(new Font("Century Gothic", Font.BOLD, 13));
+        fullscreenToggleBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        fullscreenToggleBtn.addMouseListener(new MouseAdapter() {
+            public void mouseEntered(MouseEvent evt) { fullscreenToggleBtn.setForeground(Main.globalTheme.accent); }
+            public void mouseExited(MouseEvent evt) { fullscreenToggleBtn.setForeground(isFullscreen ? Main.globalTheme.accent : Main.globalTheme.fg); }
+            public void mouseClicked(MouseEvent evt) { toggleFullscreen(); }
         });
 
         rightStatusPanel.add(wordCountLabel);
@@ -103,26 +122,17 @@ public class ScreenwriterUI extends JFrame {
         add(statusPanel, BorderLayout.SOUTH);
 
         setupMenus();
+        setupSlidingMenuLogic();
         setupKeyBindings();
         setupDocumentFilter();
         setupListeners();
 
         applyTheme();
         applyFont();
-        applyCurrentFormatting();
-    }
 
-    private JLabel createStatusButton(String text) {
-        JLabel btn = new JLabel(text);
-        btn.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btn.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) { btn.setForeground(Main.globalTheme.accent); }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                btn.setForeground(isFocusMode && text.equals("Focus") ? Main.globalTheme.accent : Main.globalTheme.fg);
-            }
-        });
-        return btn;
+        // Ensure the entire document respects the saved Global Alignment on startup
+        changeAlignment(Main.globalAlignment);
+        applyCurrentFormatting();
     }
 
     private void checkUnsavedAndExecute(Runnable action) {
@@ -154,7 +164,8 @@ public class ScreenwriterUI extends JFrame {
         menuBar = new JMenuBar();
         menuBar.setBorder(BorderFactory.createEmptyBorder(6, 12, 6, 12));
 
-        fileMenu = new JMenu(); settingsMenu = new JMenu();
+        fileMenu = new JMenu(); viewMenu = new JMenu(); themeMenu = new JMenu();
+        fontMenu = new JMenu(); sizeMenu = new JMenu(); langMenu = new JMenu(); audioMenu = new JMenu();
 
         newItem = new JMenuItem(); newItem.addActionListener(e -> checkUnsavedAndExecute(() -> { textPane.setText(""); wordCount = 0; updateStatus(); }));
         openItem = new JMenuItem(); openItem.addActionListener(e -> checkUnsavedAndExecute(this::openFile));
@@ -167,55 +178,146 @@ public class ScreenwriterUI extends JFrame {
         fileMenu.add(saveItem); fileMenu.add(printItem); fileMenu.addSeparator();
         fileMenu.add(changeTypeItem); fileMenu.addSeparator(); fileMenu.add(exitMenuItem);
 
-        viewMenu = new JMenu();
         fullscreenItem = new JMenuItem(); fullscreenItem.addActionListener(e -> toggleFullscreen());
         focusItem = new JMenuItem(); focusItem.addActionListener(e -> toggleFocusMode());
-        viewMenu.add(fullscreenItem); viewMenu.add(focusItem);
 
-        themeMenu = new JMenu();
+        // --- TEXT ALIGNMENT & FIXED CARRIAGE MENUS ---
+        alignMenu = new JMenu();
+        leftAlign = new JMenuItem(); leftAlign.addActionListener(e -> changeAlignment(StyleConstants.ALIGN_LEFT));
+        centerAlign = new JMenuItem(); centerAlign.addActionListener(e -> changeAlignment(StyleConstants.ALIGN_CENTER));
+        rightAlign = new JMenuItem(); rightAlign.addActionListener(e -> changeAlignment(StyleConstants.ALIGN_RIGHT));
+        alignMenu.add(leftAlign); alignMenu.add(centerAlign); alignMenu.add(rightAlign);
+
+        fixedCarriageToggle = new JCheckBoxMenuItem();
+        fixedCarriageToggle.setState(Main.isFixedCarriage);
+        fixedCarriageToggle.addActionListener(e -> {
+            Main.isFixedCarriage = fixedCarriageToggle.getState();
+            Main.savePreferences();
+            centerCarriage(); // Immediately scroll the screen to center when toggled
+        });
+
+        viewMenu.add(fullscreenItem); viewMenu.add(focusItem); viewMenu.addSeparator();
+        viewMenu.add(alignMenu); viewMenu.add(fixedCarriageToggle);
+
         for (Theme t : Theme.values()) {
             JMenuItem item = new JMenuItem();
-            item.addActionListener(e -> { Main.globalTheme = t; applyTheme(); });
+            item.addActionListener(e -> { Main.globalTheme = t; Main.savePreferences(); applyTheme(); });
             themeMenu.add(item);
         }
 
-        fontMenu = new JMenu();
-        for (String f : new String[]{"Courier New", "Consolas", "Monospaced", "Georgia", "Times New Roman"}) {
+        String[] allFonts = {"Courier New", "Consolas", "Monospaced", "Georgia", "Times New Roman", "Arial", "Helvetica", "Century Gothic", "Verdana", "Tahoma", "Trebuchet MS", "Garamond", "Comic Sans MS"};
+        for (String f : allFonts) {
             JMenuItem item = new JMenuItem(f);
-            item.addActionListener(e -> { currentFontName = f; applyFont(); });
+            item.addActionListener(e -> { Main.globalFontName = f; Main.savePreferences(); applyFont(); });
             fontMenu.add(item);
         }
 
-        sizeMenu = new JMenu();
-        for (int s : new int[]{12, 14, 16, 18, 22}) {
+        for (int s : new int[]{10, 12, 14, 16, 18, 20, 22, 24, 28}) {
             JMenuItem item = new JMenuItem(s + " pt");
-            item.addActionListener(e -> { currentFontSize = s; applyFont(); });
+            item.addActionListener(e -> { Main.globalFontSize = s; Main.savePreferences(); applyFont(); });
             sizeMenu.add(item);
         }
 
-        langMenu = new JMenu();
         for (Localization.Lang l : Localization.Lang.values()) {
             JMenuItem item = new JMenuItem(l.name());
-            item.addActionListener(e -> { Localization.current = l; updateLanguage(); });
+            item.addActionListener(e -> { Localization.current = l; Main.savePreferences(); updateLanguage(); });
             langMenu.add(item);
         }
 
-        audioMenu = new JMenu();
         clackToggle = new JCheckBoxMenuItem(); clackToggle.setState(TypewriterSound.isClackEnabled);
-        clackToggle.addActionListener(e -> TypewriterSound.isClackEnabled = clackToggle.getState());
+        clackToggle.addActionListener(e -> { TypewriterSound.isClackEnabled = clackToggle.getState(); Main.savePreferences(); });
         bellToggle = new JCheckBoxMenuItem(); bellToggle.setState(TypewriterSound.isBellEnabled);
-        bellToggle.addActionListener(e -> TypewriterSound.isBellEnabled = bellToggle.getState());
+        bellToggle.addActionListener(e -> { TypewriterSound.isBellEnabled = bellToggle.getState(); Main.savePreferences(); });
         returnToggle = new JCheckBoxMenuItem(); returnToggle.setState(TypewriterSound.isReturnEnabled);
-        returnToggle.addActionListener(e -> TypewriterSound.isReturnEnabled = returnToggle.getState());
+        returnToggle.addActionListener(e -> { TypewriterSound.isReturnEnabled = returnToggle.getState(); Main.savePreferences(); });
         audioMenu.add(clackToggle); audioMenu.add(bellToggle); audioMenu.add(returnToggle);
 
-        settingsMenu.add(viewMenu); settingsMenu.addSeparator();
-        settingsMenu.add(themeMenu); settingsMenu.add(fontMenu); settingsMenu.add(sizeMenu);
-        settingsMenu.addSeparator(); settingsMenu.add(audioMenu); settingsMenu.addSeparator(); settingsMenu.add(langMenu);
+        menuBar.add(fileMenu); menuBar.add(viewMenu); menuBar.add(themeMenu);
+        menuBar.add(fontMenu); menuBar.add(sizeMenu); menuBar.add(audioMenu); menuBar.add(langMenu);
 
-        menuBar.add(fileMenu); menuBar.add(settingsMenu);
-        setJMenuBar(menuBar);
+        topMenuContainer = new JPanel(new BorderLayout());
+        topMenuContainer.add(menuBar, BorderLayout.CENTER);
+        topMenuContainer.setPreferredSize(new Dimension(getWidth(), 40));
+        add(topMenuContainer, BorderLayout.NORTH);
+
         updateLanguage();
+    }
+
+    private void setupSlidingMenuLogic() {
+        menuAnimator = new Timer(10, e -> {
+            int h = topMenuContainer.getPreferredSize().height;
+            int target = isMenuShowing ? 40 : 0;
+            if (h != target) {
+                h += (isMenuShowing ? 5 : -5);
+                h = Math.max(0, Math.min(40, h));
+                topMenuContainer.setPreferredSize(new Dimension(getWidth(), h));
+                topMenuContainer.revalidate();
+            } else {
+                ((Timer)e.getSource()).stop();
+            }
+        });
+
+        MouseAdapter slideListener = new MouseAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                if (isFocusMode) return;
+                Point p = SwingUtilities.convertPoint(e.getComponent(), e.getPoint(), ScreenwriterUI.this);
+
+                boolean isMenuOpen = false;
+                for (MenuElement el : menuBar.getSubElements()) {
+                    if (el.getComponent() instanceof JMenu && ((JMenu) el).isSelected()) {
+                        isMenuOpen = true; break;
+                    }
+                }
+
+                if (p.y <= 50) {
+                    if (!isMenuShowing) { isMenuShowing = true; menuAnimator.start(); }
+                } else if (p.y > 150 && !isMenuOpen) {
+                    if (isMenuShowing) { isMenuShowing = false; menuAnimator.start(); }
+                }
+            }
+        };
+
+        textPane.addMouseMotionListener(slideListener);
+        menuBar.addMouseMotionListener(slideListener);
+        statusPanel.addMouseMotionListener(slideListener);
+    }
+
+    // --- NEW: TYPEWRITER SIMULATION MECHANICS ---
+
+    // 1. Instantly forces alignment across the entire document
+    private void changeAlignment(int alignment) {
+        Main.globalAlignment = alignment;
+        Main.savePreferences();
+        StyledDocument doc = textPane.getStyledDocument();
+        SimpleAttributeSet attrs = new SimpleAttributeSet();
+        StyleConstants.setAlignment(attrs, alignment);
+        doc.setParagraphAttributes(0, doc.getLength(), attrs, false);
+        textPane.repaint();
+    }
+
+    // 2. Mathematically calculates exact bounds to force the virtual paper to slide under the cursor
+    private void centerCarriage() {
+        if (Main.isFixedCarriage && scrollPane != null) {
+            SwingUtilities.invokeLater(() -> {
+                try {
+                    Rectangle rect = textPane.modelToView2D(textPane.getCaretPosition()).getBounds();
+                    JViewport viewport = scrollPane.getViewport();
+
+                    int extentWidth = viewport.getExtentSize().width;
+                    int extentHeight = viewport.getExtentSize().height;
+
+                    int viewX = Math.max(0, rect.x - (extentWidth / 2));
+                    int viewY = Math.max(0, rect.y - (extentHeight / 2));
+
+                    // Cap bounds to ensure smooth scrolling
+                    int maxX = Math.max(0, textPane.getWidth() - extentWidth);
+                    int maxY = Math.max(0, textPane.getHeight() - extentHeight);
+
+                    viewport.setViewPosition(new Point(Math.min(viewX, maxX), Math.min(viewY, maxY)));
+                } catch (Exception ex) {}
+            });
+        }
     }
 
     private void toggleFullscreen() {
@@ -230,11 +332,23 @@ public class ScreenwriterUI extends JFrame {
 
     private void toggleFocusMode() {
         isFocusMode = !isFocusMode;
-        menuBar.setVisible(!isFocusMode);
+        if (isFocusMode) {
+            isMenuShowing = false;
+            topMenuContainer.setPreferredSize(new Dimension(getWidth(), 0));
+        } else {
+            isMenuShowing = true;
+            topMenuContainer.setPreferredSize(new Dimension(getWidth(), 40));
+        }
+        topMenuContainer.revalidate();
         focusToggleBtn.setForeground(isFocusMode ? Main.globalTheme.accent : Main.globalTheme.fg);
     }
 
     private void styleMenuComponents(MenuElement[] elements) {
+        Border shadowBorder = BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(0, 0, 6, 6, new Color(0, 0, 0, 80)),
+                BorderFactory.createLineBorder(Main.globalTheme.accent, 1)
+        );
+
         for (MenuElement el : elements) {
             Component c = el.getComponent();
             if (c instanceof JComponent) {
@@ -242,19 +356,11 @@ public class ScreenwriterUI extends JFrame {
                 jc.setOpaque(true);
                 jc.setBackground(Main.globalTheme.statusBg);
                 jc.setForeground(Main.globalTheme.fg);
-
-                // Add unique "floating panel" margins inside the dropdowns
-                if (jc instanceof JMenuItem) {
-                    jc.setBorder(BorderFactory.createEmptyBorder(8, 20, 8, 20));
-                }
+                if (jc instanceof JMenuItem) jc.setBorder(BorderFactory.createEmptyBorder(8, 20, 8, 20));
             }
             if (c instanceof JMenu) {
                 JPopupMenu popup = ((JMenu) c).getPopupMenu();
-                // Thick accent border to make the menu pop off the screen
-                popup.setBorder(BorderFactory.createCompoundBorder(
-                        BorderFactory.createLineBorder(Main.globalTheme.accent, 2),
-                        BorderFactory.createEmptyBorder(5, 5, 5, 5)
-                ));
+                popup.setBorder(shadowBorder);
                 popup.setBackground(Main.globalTheme.statusBg);
             }
             if (el.getSubElements().length > 0) styleMenuComponents(el.getSubElements());
@@ -277,6 +383,7 @@ public class ScreenwriterUI extends JFrame {
                 BorderFactory.createEmptyBorder(6, 20, 6, 20)
         ));
 
+        topMenuContainer.setBackground(Main.globalTheme.statusBg);
         menuBar.setOpaque(true);
         menuBar.setBackground(Main.globalTheme.statusBg);
         menuBar.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Main.globalTheme.marginColor));
@@ -284,8 +391,8 @@ public class ScreenwriterUI extends JFrame {
         styleMenuComponents(menuBar.getSubElements());
 
         suggestionMenu.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(Main.globalTheme.accent, 2),
-                BorderFactory.createEmptyBorder(5, 5, 5, 5)
+                BorderFactory.createMatteBorder(0, 0, 6, 6, new Color(0, 0, 0, 80)),
+                BorderFactory.createLineBorder(Main.globalTheme.accent, 1)
         ));
         suggestionMenu.setBackground(Main.globalTheme.statusBg);
 
@@ -293,24 +400,41 @@ public class ScreenwriterUI extends JFrame {
         textPane.repaint();
     }
 
-    private void applyFont() { textPane.setFont(new Font(currentFontName, Font.PLAIN, currentFontSize)); }
+    private void applyFont() { textPane.setFont(new Font(Main.globalFontName, Font.PLAIN, Main.globalFontSize)); }
 
     private void updateLanguage() {
         setTitle("TYPEWRITER - " + Localization.get(documentType.langKey));
+
         fileMenu.setText(Localization.get("File"));
-        newItem.setText(Localization.get("New")); openItem.setText(Localization.get("Open"));
-        saveItem.setText(Localization.get("Save")); printItem.setText(Localization.get("Print"));
-        changeTypeItem.setText(Localization.get("ChangeType")); exitMenuItem.setText(Localization.get("Exit"));
+        newItem.setText(Localization.get("New"));
+        openItem.setText(Localization.get("Open"));
+        saveItem.setText(Localization.get("Save"));
+        printItem.setText(Localization.get("Print"));
+        changeTypeItem.setText(Localization.get("ChangeType"));
+        exitMenuItem.setText(Localization.get("Exit"));
 
-        settingsMenu.setText(Localization.get("Settings")); viewMenu.setText(Localization.get("View"));
-        fullscreenItem.setText(Localization.get("Fullscreen")); focusItem.setText(Localization.get("Focus"));
+        viewMenu.setText(Localization.get("View"));
+        fullscreenItem.setText(Localization.get("Fullscreen"));
+        focusItem.setText(Localization.get("Focus"));
 
-        themeMenu.setText(Localization.get("Theme")); fontMenu.setText(Localization.get("Font"));
-        sizeMenu.setText(Localization.get("FontSize")); langMenu.setText(Localization.get("Language"));
+        alignMenu.setText(Localization.get("Alignment"));
+        leftAlign.setText(Localization.get("AlignLeft"));
+        centerAlign.setText(Localization.get("AlignCenter"));
+        rightAlign.setText(Localization.get("AlignRight"));
+        fixedCarriageToggle.setText(Localization.get("FixedCarriage"));
+
+        themeMenu.setText(Localization.get("Theme"));
+        fontMenu.setText(Localization.get("Font"));
+        sizeMenu.setText(Localization.get("FontSize"));
+        langMenu.setText(Localization.get("Language"));
         audioMenu.setText(Localization.get("Audio"));
 
-        clackToggle.setText(Localization.get("SoundClack")); bellToggle.setText(Localization.get("SoundBell"));
+        clackToggle.setText(Localization.get("SoundClack"));
+        bellToggle.setText(Localization.get("SoundBell"));
         returnToggle.setText(Localization.get("SoundReturn"));
+
+        focusToggleBtn.setText(Localization.get("Focus"));
+        fullscreenToggleBtn.setText(Localization.get("Fullscreen"));
 
         for (int i = 0; i < Theme.values().length; i++) themeMenu.getItem(i).setText(Localization.get(Theme.values()[i].langKey));
         updateStatus();
@@ -405,6 +529,9 @@ public class ScreenwriterUI extends JFrame {
             javax.swing.text.Element p = doc.getCharacterElement(textPane.getCaretPosition()).getParentElement();
             String modeName = (String) p.getAttributes().getAttribute("ElementType");
             if (modeName != null) { try { currentMode = ElementType.valueOf(modeName); updateStatus(); } catch (Exception ignored) {} }
+
+            // Re-centers the viewport seamlessly while typing or clicking if Fixed Carriage is ON
+            centerCarriage();
         });
 
         textPane.getDocument().addDocumentListener(new DocumentListener() {
@@ -500,6 +627,10 @@ public class ScreenwriterUI extends JFrame {
         SimpleAttributeSet attrs = new SimpleAttributeSet();
         StyleConstants.setLeftIndent(attrs, currentMode.getSwingIndent());
         StyleConstants.setFirstLineIndent(attrs, currentMode.getFirstLineIndent());
+
+        // Tells the engine to check memory and align the text correctly (Left, Center, or Right)
+        StyleConstants.setAlignment(attrs, Main.globalAlignment);
+
         attrs.addAttribute("ElementType", currentMode.name());
         doc.setParagraphAttributes(textPane.getCaretPosition(), 0, attrs, false);
     }
