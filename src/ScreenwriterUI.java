@@ -15,7 +15,7 @@ public class ScreenwriterUI extends JFrame {
     private JTextPane textPane;
     private JScrollPane scrollPane;
     private JLabel statusLabel, wordCountLabel;
-    private JLabel focusToggleBtn, fullscreenToggleBtn;
+    private JLabel focusToggleBtn, fullscreenToggleBtn, lockToggleBtn;
     private JPanel statusPanel, rightStatusPanel;
 
     private JPanel topMenuContainer;
@@ -81,8 +81,6 @@ public class ScreenwriterUI extends JFrame {
 
         scrollPane = new JScrollPane(textPane);
         scrollPane.setBorder(null);
-
-        // --- NEW: PLATEN SCROLL AUDIO EFFECT ---
         scrollPane.addMouseWheelListener(e -> TypewriterSound.playScroll());
 
         add(scrollPane, BorderLayout.CENTER);
@@ -99,6 +97,17 @@ public class ScreenwriterUI extends JFrame {
 
         wordCountLabel = new JLabel();
         wordCountLabel.setFont(new Font("Century Gothic", Font.BOLD, 13));
+
+        // --- NEW: DEDICATED LOCK BUTTON ---
+        lockToggleBtn = new JLabel(Localization.get(Main.isMenuLocked ? "LockON" : "LockOFF"));
+        lockToggleBtn.setFont(new Font("Century Gothic", Font.BOLD, 13));
+        lockToggleBtn.setForeground(Main.isMenuLocked ? Main.globalTheme.accent : Main.globalTheme.fg);
+        lockToggleBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        lockToggleBtn.addMouseListener(new MouseAdapter() {
+            public void mouseEntered(MouseEvent evt) { lockToggleBtn.setForeground(Main.globalTheme.accent); }
+            public void mouseExited(MouseEvent evt) { lockToggleBtn.setForeground(Main.isMenuLocked ? Main.globalTheme.accent : Main.globalTheme.fg); }
+            public void mouseClicked(MouseEvent evt) { toggleMenuLock(); }
+        });
 
         focusToggleBtn = new JLabel(Localization.get("Focus"));
         focusToggleBtn.setFont(new Font("Century Gothic", Font.BOLD, 13));
@@ -119,6 +128,7 @@ public class ScreenwriterUI extends JFrame {
         });
 
         rightStatusPanel.add(wordCountLabel);
+        rightStatusPanel.add(lockToggleBtn);
         rightStatusPanel.add(focusToggleBtn);
         rightStatusPanel.add(fullscreenToggleBtn);
         statusPanel.add(rightStatusPanel, BorderLayout.EAST);
@@ -243,7 +253,8 @@ public class ScreenwriterUI extends JFrame {
 
         topMenuContainer = new JPanel(new BorderLayout());
         topMenuContainer.add(menuBar, BorderLayout.CENTER);
-        topMenuContainer.setPreferredSize(new Dimension(getWidth(), 40));
+        topMenuContainer.setPreferredSize(new Dimension(getWidth(), Main.isMenuLocked ? 40 : 0));
+        if (Main.isMenuLocked) isMenuShowing = true;
         add(topMenuContainer, BorderLayout.NORTH);
 
         updateLanguage();
@@ -266,7 +277,8 @@ public class ScreenwriterUI extends JFrame {
         MouseAdapter slideListener = new MouseAdapter() {
             @Override
             public void mouseMoved(MouseEvent e) {
-                if (isFocusMode) return;
+                if (isFocusMode || Main.isMenuLocked) return;
+
                 Point p = SwingUtilities.convertPoint(e.getComponent(), e.getPoint(), ScreenwriterUI.this);
 
                 boolean isMenuOpen = false;
@@ -287,6 +299,18 @@ public class ScreenwriterUI extends JFrame {
         textPane.addMouseMotionListener(slideListener);
         menuBar.addMouseMotionListener(slideListener);
         statusPanel.addMouseMotionListener(slideListener);
+    }
+
+    private void toggleMenuLock() {
+        Main.isMenuLocked = !Main.isMenuLocked;
+        Main.savePreferences();
+        lockToggleBtn.setText(Localization.get(Main.isMenuLocked ? "LockON" : "LockOFF"));
+        lockToggleBtn.setForeground(Main.isMenuLocked ? Main.globalTheme.accent : Main.globalTheme.fg);
+
+        if (Main.isMenuLocked && !isMenuShowing && !isFocusMode) {
+            isMenuShowing = true;
+            menuAnimator.start();
+        }
     }
 
     private void changeAlignment(int alignment) {
@@ -376,6 +400,7 @@ public class ScreenwriterUI extends JFrame {
         statusPanel.setBackground(Main.globalTheme.statusBg);
         statusLabel.setForeground(Main.globalTheme.fg);
         wordCountLabel.setForeground(Main.globalTheme.fg);
+        lockToggleBtn.setForeground(Main.isMenuLocked ? Main.globalTheme.accent : Main.globalTheme.fg);
         focusToggleBtn.setForeground(isFocusMode ? Main.globalTheme.accent : Main.globalTheme.fg);
         fullscreenToggleBtn.setForeground(isFullscreen ? Main.globalTheme.accent : Main.globalTheme.fg);
 
@@ -435,6 +460,7 @@ public class ScreenwriterUI extends JFrame {
         returnToggle.setText(Localization.get("SoundReturn"));
         scrollToggle.setText(Localization.get("SoundScroll"));
 
+        lockToggleBtn.setText(Localization.get(Main.isMenuLocked ? "LockON" : "LockOFF"));
         focusToggleBtn.setText(Localization.get("Focus"));
         fullscreenToggleBtn.setText(Localization.get("Fullscreen"));
 

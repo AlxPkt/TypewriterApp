@@ -7,6 +7,7 @@ public class Localization {
             switch (key) {
                 case "File": return "Soubor"; case "New": return "Nový dokument..."; case "Open": return "Otevřít dokument..."; case "Save": return "Uložit jako .txt..."; case "Print": return "Vytisknout..."; case "Exit": return "Ukončit program";
                 case "View": return "Zobrazení"; case "Fullscreen": return "Celá obrazovka"; case "Focus": return "Režim soustředění";
+                case "LockON": return "Ukotvení: ZAP"; case "LockOFF": return "Ukotvení: VYP";
                 case "Alignment": return "Zarovnání textu"; case "AlignLeft": return "Zarovnat doleva"; case "AlignCenter": return "Zarovnat na střed"; case "AlignRight": return "Zarovnat doprava"; case "FixedCarriage": return "Pevný válec (Středování stránky)";
                 case "Theme": return "Motiv"; case "Font": return "Písmo"; case "FontSize": return "Velikost písma"; case "Language": return "Jazyk rozhraní";
                 case "Audio": return "Zvuky stroje"; case "SoundClack": return "Klapání kláves"; case "SoundBell": return "Cinknutí na konci řádku"; case "SoundReturn": return "Odřádkování (Posun válce)"; case "SoundScroll": return "Otáčení válce (Skrollování)";
@@ -23,6 +24,7 @@ public class Localization {
             switch (key) {
                 case "File": return "Datei"; case "New": return "Neu..."; case "Open": return "Öffnen..."; case "Save": return "Speichern als .txt..."; case "Print": return "Drucken..."; case "Exit": return "Beenden";
                 case "View": return "Ansicht"; case "Fullscreen": return "Vollbild"; case "Focus": return "Fokus-Modus";
+                case "LockON": return "Menü: EIN"; case "LockOFF": return "Menü: AUS";
                 case "Alignment": return "Textausrichtung"; case "AlignLeft": return "Links"; case "AlignCenter": return "Zentriert"; case "AlignRight": return "Rechts"; case "FixedCarriage": return "Fester Wagen (Zentrieren)";
                 case "Theme": return "Design"; case "Font": return "Schriftart"; case "FontSize": return "Schriftgröße"; case "Language": return "Sprache";
                 case "Audio": return "Audio"; case "SoundClack": return "Tastenklick"; case "SoundBell": return "Zeilenglocke"; case "SoundReturn": return "Wagenrücklauf"; case "SoundScroll": return "Walzendrehung (Mausrad)";
@@ -38,6 +40,7 @@ public class Localization {
             switch (key) {
                 case "File": return "Archivo"; case "New": return "Nuevo..."; case "Open": return "Abrir..."; case "Save": return "Guardar como .txt..."; case "Print": return "Imprimir..."; case "Exit": return "Salir";
                 case "View": return "Ver"; case "Fullscreen": return "Pantalla completa"; case "Focus": return "Modo enfoque";
+                case "LockON": return "Bloqueo: ON"; case "LockOFF": return "Bloqueo: OFF";
                 case "Alignment": return "Alineación de texto"; case "AlignLeft": return "Izquierda"; case "AlignCenter": return "Centro"; case "AlignRight": return "Derecha"; case "FixedCarriage": return "Carro Fijo (Centrado)";
                 case "Theme": return "Tema"; case "Font": return "Fuente"; case "FontSize": return "Tamaño de fuente"; case "Language": return "Idioma";
                 case "Audio": return "Audio"; case "SoundClack": return "Clic de tecla"; case "SoundBell": return "Campana de margen"; case "SoundReturn": return "Retorno de carro"; case "SoundScroll": return "Rodillo (Rueda del ratón)";
@@ -53,6 +56,7 @@ public class Localization {
             switch (key) {
                 case "File": return "Fichier"; case "New": return "Nouveau..."; case "Open": return "Ouvrir..."; case "Save": return "Enregistrer sous .txt..."; case "Print": return "Imprimer..."; case "Exit": return "Quitter";
                 case "View": return "Affichage"; case "Fullscreen": return "Plein écran"; case "Focus": return "Mode concentration";
+                case "LockON": return "Verrou: OUI"; case "LockOFF": return "Verrou: NON";
                 case "Alignment": return "Alignement du texte"; case "AlignLeft": return "Gauche"; case "AlignCenter": return "Centre"; case "AlignRight": return "Droite"; case "FixedCarriage": return "Chariot Fixe (Centrage)";
                 case "Theme": return "Thème"; case "Font": return "Police"; case "FontSize": return "Taille de police"; case "Language": return "Langue";
                 case "Audio": return "Audio"; case "SoundClack": return "Clic de touche"; case "SoundBell": return "Cloche de marge"; case "SoundReturn": return "Retour chariot"; case "SoundScroll": return "Rouleau (Molette de souris)";
@@ -70,6 +74,7 @@ public class Localization {
         switch (key) {
             case "File": return "File"; case "New": return "New..."; case "Open": return "Open..."; case "Save": return "Save to .txt..."; case "Print": return "Print..."; case "Exit": return "Exit";
             case "View": return "View"; case "Fullscreen": return "Fullscreen"; case "Focus": return "Focus Mode";
+            case "LockON": return "Lock: ON"; case "LockOFF": return "Lock: OFF";
             case "Alignment": return "Text Alignment"; case "AlignLeft": return "Left"; case "AlignCenter": return "Center"; case "AlignRight": return "Right"; case "FixedCarriage": return "Fixed Carriage (Centering)";
             case "Theme": return "Theme"; case "Font": return "Font"; case "FontSize": return "Font Size"; case "Language": return "Language";
             case "Audio": return "Audio"; case "SoundClack": return "Keystroke Clack"; case "SoundBell": return "Margin Bell"; case "SoundReturn": return "Carriage Return"; case "SoundScroll": return "Platen Scroll (Mouse Wheel)";

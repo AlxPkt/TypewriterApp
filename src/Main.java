@@ -11,6 +11,7 @@ public class Main {
 
     public static int globalAlignment = StyleConstants.ALIGN_LEFT;
     public static boolean isFixedCarriage = false;
+    public static boolean isMenuLocked = false;
 
     public static Preferences prefs = Preferences.userNodeForPackage(Main.class);
 
@@ -36,6 +37,7 @@ public class Main {
 
         globalAlignment = prefs.getInt("alignment", StyleConstants.ALIGN_LEFT);
         isFixedCarriage = prefs.getBoolean("fixedCarriage", false);
+        isMenuLocked = prefs.getBoolean("menuLocked", false);
     }
 
     public static void savePreferences() {
@@ -50,6 +52,7 @@ public class Main {
 
         prefs.putInt("alignment", globalAlignment);
         prefs.putBoolean("fixedCarriage", isFixedCarriage);
+        prefs.putBoolean("menuLocked", isMenuLocked);
     }
 
     private static void setUIFont(javax.swing.plaf.FontUIResource f) {
@@ -64,9 +67,8 @@ public class Main {
     }
 
     public static void showLauncher() {
-        // UPGRADED to JFrame to allow hard-exits
         JFrame launcher = new JFrame("TYPEWRITER");
-        launcher.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Fully terminates the JVM when the 'X' is clicked
+        launcher.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         launcher.setSize(850, 540);
         launcher.setLocationRelativeTo(null);
@@ -111,7 +113,7 @@ public class Main {
             });
 
             btn.addActionListener(e -> {
-                launcher.dispose(); // Safely closes the Launcher without triggering EXIT_ON_CLOSE
+                launcher.dispose();
                 ScreenwriterUI app = new ScreenwriterUI(type);
                 app.setLocationRelativeTo(null);
                 app.setVisible(true);
