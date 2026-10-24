@@ -98,7 +98,6 @@ public class ScreenwriterUI extends JFrame {
         wordCountLabel = new JLabel();
         wordCountLabel.setFont(new Font("Century Gothic", Font.BOLD, 13));
 
-        // --- NEW: DEDICATED LOCK BUTTON ---
         lockToggleBtn = new JLabel(Localization.get(Main.isMenuLocked ? "LockON" : "LockOFF"));
         lockToggleBtn.setFont(new Font("Century Gothic", Font.BOLD, 13));
         lockToggleBtn.setForeground(Main.isMenuLocked ? Main.globalTheme.accent : Main.globalTheme.fg);
@@ -327,7 +326,10 @@ public class ScreenwriterUI extends JFrame {
         if (Main.isFixedCarriage && scrollPane != null) {
             SwingUtilities.invokeLater(() -> {
                 try {
-                    Rectangle rect = textPane.modelToView2D(textPane.getCaretPosition()).getBounds();
+                    // Changed to Java 8 compatible modelToView
+                    Rectangle rect = textPane.modelToView(textPane.getCaretPosition());
+                    if (rect == null) return;
+
                     JViewport viewport = scrollPane.getViewport();
 
                     int extentWidth = viewport.getExtentSize().width;
@@ -543,9 +545,12 @@ public class ScreenwriterUI extends JFrame {
                 }
 
                 if (foundMatch) {
-                    Rectangle rect = textPane.modelToView2D(caretOffset).getBounds();
-                    suggestionMenu.show(textPane, rect.x, rect.y + rect.height + 5);
-                    textPane.requestFocusInWindow();
+                    // Changed to Java 8 compatible modelToView
+                    Rectangle rect = textPane.modelToView(caretOffset);
+                    if (rect != null) {
+                        suggestionMenu.show(textPane, rect.x, rect.y + rect.height + 5);
+                        textPane.requestFocusInWindow();
+                    }
                 } else currentSuggestion = null;
             } catch (Exception e) {}
         });
