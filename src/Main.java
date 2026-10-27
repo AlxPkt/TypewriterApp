@@ -12,6 +12,7 @@ public class Main {
     public static int globalAlignment = StyleConstants.ALIGN_LEFT;
     public static boolean isFixedCarriage = false;
     public static boolean isMenuLocked = false;
+    public static boolean isCrtMode = false;
 
     public static Preferences prefs = Preferences.userNodeForPackage(Main.class);
 
@@ -38,6 +39,7 @@ public class Main {
         globalAlignment = prefs.getInt("alignment", StyleConstants.ALIGN_LEFT);
         isFixedCarriage = prefs.getBoolean("fixedCarriage", false);
         isMenuLocked = prefs.getBoolean("menuLocked", false);
+        isCrtMode = prefs.getBoolean("crtMode", false);
     }
 
     public static void savePreferences() {
@@ -53,6 +55,7 @@ public class Main {
         prefs.putInt("alignment", globalAlignment);
         prefs.putBoolean("fixedCarriage", isFixedCarriage);
         prefs.putBoolean("menuLocked", isMenuLocked);
+        prefs.putBoolean("crtMode", isCrtMode);
     }
 
     private static void setUIFont(javax.swing.plaf.FontUIResource f) {

@@ -10,6 +10,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.awt.print.PrinterJob;
+import crt.TerminalSound;
 
 public class ScreenwriterUI extends JFrame {
     private JTextPane textPane;
@@ -24,12 +25,12 @@ public class ScreenwriterUI extends JFrame {
     private boolean isMenuShowing = true;
 
     private JMenu fileMenu, viewMenu, themeMenu, fontMenu, sizeMenu, langMenu, audioMenu;
-    private JMenuItem newItem, openItem, saveItem, printItem, changeTypeItem, exitMenuItem;
+    private JMenuItem newItem, openItem, saveItem, saveRtfItem, printItem, changeTypeItem, exitMenuItem;
     private JMenuItem fullscreenItem, focusItem;
 
     private JMenu alignMenu;
     private JMenuItem leftAlign, centerAlign, rightAlign;
-    private JCheckBoxMenuItem fixedCarriageToggle;
+    private JCheckBoxMenuItem fixedCarriageToggle, crtToggle;
 
     private JCheckBoxMenuItem clackToggle, bellToggle, returnToggle, scrollToggle;
 
@@ -50,7 +51,16 @@ public class ScreenwriterUI extends JFrame {
 
         setTitle("TYPEWRITER - " + Localization.get(docType.langKey));
         setSize(1100, 850);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        // --- NEW: INTERCEPTS THE WINDOW 'X' BUTTON ---
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent e) {
+                checkUnsavedAndExecute(() -> System.exit(0));
+            }
+        });
+
         setLayout(new BorderLayout());
 
         suggestionMenu = new JPopupMenu();
@@ -81,7 +91,9 @@ public class ScreenwriterUI extends JFrame {
 
         scrollPane = new JScrollPane(textPane);
         scrollPane.setBorder(null);
-        scrollPane.addMouseWheelListener(e -> TypewriterSound.playScroll());
+        scrollPane.addMouseWheelListener(e -> {
+            if (Main.isCrtMode) TerminalSound.playScroll(); else TypewriterSound.playScroll();
+        });
 
         add(scrollPane, BorderLayout.CENTER);
 
@@ -179,13 +191,17 @@ public class ScreenwriterUI extends JFrame {
 
         newItem = new JMenuItem(); newItem.addActionListener(e -> checkUnsavedAndExecute(() -> { textPane.setText(""); wordCount = 0; updateStatus(); }));
         openItem = new JMenuItem(); openItem.addActionListener(e -> checkUnsavedAndExecute(this::openFile));
+
         saveItem = new JMenuItem(); saveItem.addActionListener(e -> saveFile());
+        saveRtfItem = new JMenuItem(); saveRtfItem.addActionListener(e -> saveAsRtf());
+
         printItem = new JMenuItem(); printItem.addActionListener(e -> printFile());
         changeTypeItem = new JMenuItem(); changeTypeItem.addActionListener(e -> checkUnsavedAndExecute(() -> { this.dispose(); Main.showLauncher(); }));
         exitMenuItem = new JMenuItem(); exitMenuItem.addActionListener(e -> checkUnsavedAndExecute(() -> System.exit(0)));
 
         fileMenu.add(newItem); fileMenu.add(openItem); fileMenu.addSeparator();
-        fileMenu.add(saveItem); fileMenu.add(printItem); fileMenu.addSeparator();
+        fileMenu.add(saveItem); fileMenu.add(saveRtfItem); fileMenu.addSeparator();
+        fileMenu.add(printItem); fileMenu.addSeparator();
         fileMenu.add(changeTypeItem); fileMenu.addSeparator(); fileMenu.add(exitMenuItem);
 
         fullscreenItem = new JMenuItem(); fullscreenItem.addActionListener(e -> toggleFullscreen());
@@ -215,7 +231,7 @@ public class ScreenwriterUI extends JFrame {
             fontMenu.add(item);
         }
 
-        for (int s : new int[]{10, 12, 14, 16, 18, 20, 22, 24, 28}) {
+        for (int s : new int[]{10, 12, 14, 16, 18, 20, 22, 24, 28, 36}) {
             JMenuItem item = new JMenuItem(s + " pt");
             item.addActionListener(e -> { Main.globalFontSize = s; Main.savePreferences(); applyFont(); });
             sizeMenu.add(item);
@@ -239,7 +255,17 @@ public class ScreenwriterUI extends JFrame {
         scrollToggle = new JCheckBoxMenuItem(); scrollToggle.setState(TypewriterSound.isScrollEnabled);
         scrollToggle.addActionListener(e -> { TypewriterSound.isScrollEnabled = scrollToggle.getState(); Main.savePreferences(); });
 
+        // --- MOVED TO AUDIO MENU ---
+        crtToggle = new JCheckBoxMenuItem();
+        crtToggle.setState(Main.isCrtMode);
+        crtToggle.addActionListener(e -> {
+            Main.isCrtMode = crtToggle.getState();
+            Main.savePreferences();
+        });
+
         audioMenu.add(clackToggle); audioMenu.add(bellToggle); audioMenu.add(returnToggle); audioMenu.add(scrollToggle);
+        audioMenu.addSeparator();
+        audioMenu.add(crtToggle);
 
         menuBar.add(fileMenu); menuBar.add(viewMenu); menuBar.add(themeMenu);
         menuBar.add(fontMenu); menuBar.add(sizeMenu); menuBar.add(audioMenu); menuBar.add(langMenu);
@@ -430,6 +456,7 @@ public class ScreenwriterUI extends JFrame {
         newItem.setText(Localization.get("New"));
         openItem.setText(Localization.get("Open"));
         saveItem.setText(Localization.get("Save"));
+        saveRtfItem.setText(Localization.get("SaveRTF"));
         printItem.setText(Localization.get("Print"));
         changeTypeItem.setText(Localization.get("ChangeType"));
         exitMenuItem.setText(Localization.get("Exit"));
@@ -437,6 +464,7 @@ public class ScreenwriterUI extends JFrame {
         viewMenu.setText(Localization.get("View"));
         fullscreenItem.setText(Localization.get("Fullscreen"));
         focusItem.setText(Localization.get("Focus"));
+        crtToggle.setText(Localization.get("TerminalAudio"));
 
         alignMenu.setText(Localization.get("Alignment"));
         leftAlign.setText(Localization.get("AlignLeft"));
@@ -445,8 +473,9 @@ public class ScreenwriterUI extends JFrame {
         fixedCarriageToggle.setText(Localization.get("FixedCarriage"));
 
         themeMenu.setText(Localization.get("Theme"));
-
         themeMenu.removeAll();
+
+        // --- RESTORES THE PROPER CATEGORY THEME MENU ---
         String[] categories = {"CatDark", "CatLight", "CatNature", "CatRetro", "CatSciFi"};
         for (String catKey : categories) {
             JMenu subMenu = new JMenu(Localization.get(catKey));
@@ -504,6 +533,24 @@ public class ScreenwriterUI extends JFrame {
         return false;
     }
 
+    private void saveAsRtf() {
+        JFileChooser chooser = new JFileChooser();
+        if (chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+            java.io.File file = chooser.getSelectedFile();
+            if (!file.getName().toLowerCase().endsWith(".rtf")) {
+                file = new java.io.File(file.getAbsolutePath() + ".rtf");
+            }
+
+            try (java.io.FileOutputStream fos = new java.io.FileOutputStream(file)) {
+                javax.swing.text.rtf.RTFEditorKit rtfKit = new javax.swing.text.rtf.RTFEditorKit();
+                rtfKit.write(fos, textPane.getStyledDocument(), 0, textPane.getStyledDocument().getLength());
+                JOptionPane.showMessageDialog(this, Localization.get("Success"));
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, Localization.get("Error") + " " + ex.getMessage());
+            }
+        }
+    }
+
     private void printFile() {
         PrinterJob job = PrinterJob.getPrinterJob();
         if (job.printDialog()) {
@@ -520,7 +567,6 @@ public class ScreenwriterUI extends JFrame {
         if (currentMode == ElementType.SCENE_HEADING || currentMode == ElementType.AUDIO_SCENE) return new String[]{"INT. ", "EXT. ", "INT/EXT. "};
         else if (currentMode == ElementType.TRANSITION) return new String[]{"CUT TO:", "FADE IN:", "FADE OUT:", "DISSOLVE TO:"};
         else if (currentMode == ElementType.CHAPTER_HEADING) return new String[]{"CHAPTER "};
-            // COMIC BOOK PREDICTIONS
         else if (currentMode == ElementType.COMIC_PAGE) return new String[]{"PAGE "};
         else if (currentMode == ElementType.COMIC_PANEL) return new String[]{"PANEL "};
         else if (currentMode == ElementType.ACT_SCENE) return new String[]{"ACT ", "SCENE "};
@@ -592,7 +638,8 @@ public class ScreenwriterUI extends JFrame {
         am.put("tab-action", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 suggestionMenu.setVisible(false); currentSuggestion = null;
-                currentMode = currentMode.next(documentType); applyCurrentFormatting(); updateStatus(); TypewriterSound.playClick();
+                currentMode = currentMode.next(documentType); applyCurrentFormatting(); updateStatus();
+                if (Main.isCrtMode) TerminalSound.playClick(); else TypewriterSound.playClick();
             }
         });
 
@@ -606,14 +653,15 @@ public class ScreenwriterUI extends JFrame {
                         int start = p.getStartOffset(); int end = textPane.getCaretPosition();
                         textPane.getStyledDocument().remove(start, end - start);
                         textPane.getStyledDocument().insertString(start, currentSuggestion, textPane.getCharacterAttributes());
-                        TypewriterSound.playClick();
+                        if (Main.isCrtMode) TerminalSound.playClick(); else TypewriterSound.playClick();
                     } catch (Exception ex) {}
                     currentSuggestion = null; return;
                 }
 
                 suggestionMenu.setVisible(false);
                 textPane.replaceSelection("\n"); currentMode = currentMode.getSmartNext(documentType);
-                applyCurrentFormatting(); updateStatus(); TypewriterSound.playReturn();
+                applyCurrentFormatting(); updateStatus();
+                if (Main.isCrtMode) TerminalSound.playReturn(); else TypewriterSound.playReturn();
             }
         });
 
@@ -639,25 +687,34 @@ public class ScreenwriterUI extends JFrame {
                 int currentLength = p.getEndOffset() - p.getStartOffset() - 1;
                 int newLength = currentLength + textToInsert.length();
                 if (newLength > currentMode.getMaxChars()) return false;
-                if (newLength == currentMode.getMaxChars() - 8) TypewriterSound.playBell();
+                if (newLength == currentMode.getMaxChars() - 8) {
+                    if (Main.isCrtMode) TerminalSound.playBell(); else TypewriterSound.playBell();
+                }
                 return true;
             }
 
             public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
                 if (!processHardStop(fb, offset, string)) return;
                 if (currentMode.isAutoCapitalize() && string != null) string = string.toUpperCase();
-                super.insertString(fb, offset, string, attr); TypewriterSound.playClick(); triggerAutocompleteCheck(offset + string.length());
+                super.insertString(fb, offset, string, attr);
+                if (Main.isCrtMode) TerminalSound.playClick(); else TypewriterSound.playClick();
+                triggerAutocompleteCheck(offset + string.length());
             }
 
             public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
                 if (text != null && !processHardStop(fb, offset, text)) return;
                 if (currentMode.isAutoCapitalize() && text != null) text = text.toUpperCase();
                 super.replace(fb, offset, length, text, attrs);
-                if (text != null && text.length() == 1) TypewriterSound.playClick(); triggerAutocompleteCheck(offset + (text != null ? text.length() : 0));
+                if (text != null && text.length() == 1) {
+                    if (Main.isCrtMode) TerminalSound.playClick(); else TypewriterSound.playClick();
+                }
+                triggerAutocompleteCheck(offset + (text != null ? text.length() : 0));
             }
 
             public void remove(FilterBypass fb, int offset, int length) throws BadLocationException {
-                super.remove(fb, offset, length); TypewriterSound.playClick(); triggerAutocompleteCheck(offset);
+                super.remove(fb, offset, length);
+                if (Main.isCrtMode) TerminalSound.playClick(); else TypewriterSound.playClick();
+                triggerAutocompleteCheck(offset);
             }
         });
     }
