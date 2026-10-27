@@ -446,7 +446,6 @@ public class ScreenwriterUI extends JFrame {
 
         themeMenu.setText(Localization.get("Theme"));
 
-        // --- NEW: DYNAMICALLY REBUILDS THE THEME MENU INTO CATEGORY FOLDERS ---
         themeMenu.removeAll();
         String[] categories = {"CatDark", "CatLight", "CatNature", "CatRetro", "CatSciFi"};
         for (String catKey : categories) {
@@ -460,7 +459,6 @@ public class ScreenwriterUI extends JFrame {
             }
             if (subMenu.getItemCount() > 0) themeMenu.add(subMenu);
         }
-        // Force the new category folders to match the global UI styling
         styleMenuComponents(new MenuElement[]{themeMenu});
 
         fontMenu.setText(Localization.get("Font"));
@@ -522,7 +520,9 @@ public class ScreenwriterUI extends JFrame {
         if (currentMode == ElementType.SCENE_HEADING || currentMode == ElementType.AUDIO_SCENE) return new String[]{"INT. ", "EXT. ", "INT/EXT. "};
         else if (currentMode == ElementType.TRANSITION) return new String[]{"CUT TO:", "FADE IN:", "FADE OUT:", "DISSOLVE TO:"};
         else if (currentMode == ElementType.CHAPTER_HEADING) return new String[]{"CHAPTER "};
-        else if (currentMode == ElementType.PAGE_PANEL) return new String[]{"PAGE ", "PANEL "};
+            // COMIC BOOK PREDICTIONS
+        else if (currentMode == ElementType.COMIC_PAGE) return new String[]{"PAGE "};
+        else if (currentMode == ElementType.COMIC_PANEL) return new String[]{"PANEL "};
         else if (currentMode == ElementType.ACT_SCENE) return new String[]{"ACT ", "SCENE "};
         return null;
     }
@@ -592,7 +592,7 @@ public class ScreenwriterUI extends JFrame {
         am.put("tab-action", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 suggestionMenu.setVisible(false); currentSuggestion = null;
-                currentMode = currentMode.next(); applyCurrentFormatting(); updateStatus(); TypewriterSound.playClick();
+                currentMode = currentMode.next(documentType); applyCurrentFormatting(); updateStatus(); TypewriterSound.playClick();
             }
         });
 
@@ -612,7 +612,7 @@ public class ScreenwriterUI extends JFrame {
                 }
 
                 suggestionMenu.setVisible(false);
-                textPane.replaceSelection("\n"); currentMode = currentMode.getSmartNext();
+                textPane.replaceSelection("\n"); currentMode = currentMode.getSmartNext(documentType);
                 applyCurrentFormatting(); updateStatus(); TypewriterSound.playReturn();
             }
         });

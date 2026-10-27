@@ -5,13 +5,9 @@ public class Localization {
     public static String get(String key) {
         if (current == Lang.CZECH) {
             switch (key) {
-                // Theme Categories
                 case "CatClassic": return "Klasické"; case "CatDark": return "Tmavý režim"; case "CatLight": return "Světlý režim"; case "CatNature": return "Příroda a Teplo"; case "CatRetro": return "Retro a Vintage"; case "CatSciFi": return "Sci-Fi a Cyber";
-
-                // New Themes
                 case "Cyberpunk": return "Cyberpunk"; case "Matrix": return "Matrix"; case "Synthwave": return "Synthwave"; case "Midnight": return "Půlnoc"; case "Vampire": return "Upír"; case "Lavender": return "Levandule"; case "Arctic": return "Arktida"; case "CherryBlossom": return "Třešňový květ"; case "Autumn": return "Podzim"; case "TypewriterClassic": return "Klasický psací stroj";
 
-                // Standard UI
                 case "File": return "Soubor"; case "New": return "Nový dokument..."; case "Open": return "Otevřít dokument..."; case "Save": return "Uložit jako .txt..."; case "Print": return "Vytisknout..."; case "Exit": return "Ukončit program";
                 case "View": return "Zobrazení"; case "Fullscreen": return "Celá obrazovka"; case "Focus": return "Režim soustředění";
                 case "LockON": return "Ukotvení: ZAP"; case "LockOFF": return "Ukotvení: VYP";
@@ -24,7 +20,13 @@ public class Localization {
                 case "Warning": return "Neuložené změny"; case "Unsaved": return "Máte neuložené změny. Chcete je před odchodem uložit?";
                 case "Screenplay": return "Filmový scénář"; case "Comic Book Script": return "Komiksový scénář"; case "Novel": return "Kniha / Román"; case "Stage Play": return "Divadelní hra"; case "Podcast / Audio Drama": return "Podcast / Audio hra";
                 case "Poetry": return "Poezie"; case "Article / Blog": return "Článek / Blog"; case "Short Story": return "Povídka"; case "Journal / Diary": return "Deník";
-                case "SCENE": return "OBRAZ (MÍSTO DĚJE)"; case "ACTION": return "POPIS DĚJE"; case "CHARACTER": return "POSTAVA"; case "PARENTHETICAL": return "ZÁVORKA (POZNÁMKA)"; case "DIALOGUE": return "PROMLUVA (DIALOG)"; case "TRANSITION": return "STŘIH / PŘECHOD"; case "PAGE_PANEL": return "STRANA / PANEL"; case "CAPTION": return "POPISEK"; case "CHAPTER": return "KAPITOLA"; case "PROSE": return "TEXT"; case "ACT_SCENE": return "DĚJSTVÍ / VÝSTUP"; case "STAGE_DIRECTION": return "SCÉNICKÁ POZNÁMKA"; case "SFX_MUSIC": return "ZVUKOVÝ EFEKT / HUDBA"; case "HOST_GUEST": return "MODERÁTOR / HOST";
+
+                // STRUCTURAL ELEMENTS
+                case "SCENE": return "OBRAZ (MÍSTO DĚJE)"; case "ACTION": return "POPIS DĚJE"; case "CHARACTER": return "POSTAVA"; case "PARENTHETICAL": return "ZÁVORKA (POZNÁMKA)"; case "DIALOGUE": return "PROMLUVA (DIALOG)"; case "TRANSITION": return "STŘIH / PŘECHOD";
+                case "PAGE": return "STRANA"; case "PANEL": return "PANEL"; case "CAPTION": return "POPISEK";
+                case "CHAPTER": return "KAPITOLA"; case "PROSE": return "TEXT"; case "ACT_SCENE": return "DĚJSTVÍ / VÝSTUP"; case "STAGE_DIRECTION": return "SCÉNICKÁ POZNÁMKA"; case "SFX_MUSIC": return "ZVUKOVÝ EFEKT / HUDBA"; case "HOST_GUEST": return "MODERÁTOR / HOST";
+                case "TITLE": return "NÁZEV / TITULEK"; case "SUBHEADING": return "PODTITULEK"; case "BODY": return "TEXT (BEZ ODSAZENÍ)"; case "VERSE": return "VERŠ"; case "DATE": return "DATUM";
+
                 case "Dark": return "Tmavý"; case "Light": return "Světlý"; case "Parchment": return "Pergamen"; case "Vintage": return "Retro"; case "Blueprint": return "Technický výkres"; case "Dracula": return "Dracula"; case "Sunset": return "Západ slunce"; case "Ocean": return "Oceán"; case "Nord": return "Nord"; case "SolarizedDark": return "Solarized (Tmavý)"; case "SolarizedLight": return "Solarized (Světlý)"; case "Monokai": return "Monokai"; case "RosePine": return "Rosé Pine"; case "Coffee": return "Káva"; case "Sepia": return "Sépie"; case "Forest": return "Les"; case "Amethyst": return "Ametyst"; case "Hacker": return "Hacker";
             }
         } else if (current == Lang.GERMAN) {
@@ -44,7 +46,12 @@ public class Localization {
                 case "Warning": return "Ungespeicherte Änderungen"; case "Unsaved": return "Möchten Sie Ihre Änderungen vor dem Fortfahren speichern?";
                 case "Screenplay": return "Drehbuch"; case "Comic Book Script": return "Comic-Skript"; case "Novel": return "Roman"; case "Stage Play": return "Theaterstück"; case "Podcast / Audio Drama": return "Podcast / Hörspiel";
                 case "Poetry": return "Gedicht"; case "Article / Blog": return "Artikel / Blog"; case "Short Story": return "Kurzgeschichte"; case "Journal / Diary": return "Tagebuch";
-                case "SCENE": return "SZENE"; case "ACTION": return "HANDLUNG"; case "CHARACTER": return "CHARAKTER"; case "PARENTHETICAL": return "KLAMMERBEMERKUNG"; case "DIALOGUE": return "DIALOG"; case "TRANSITION": return "ÜBERGANG"; case "PAGE_PANEL": return "SEITE / PANEL"; case "CAPTION": return "BILDUNTERSCHRIFT"; case "CHAPTER": return "KAPITEL"; case "PROSE": return "TEXT"; case "ACT_SCENE": return "AKT / SZENE"; case "STAGE_DIRECTION": return "REGIEANWEISUNG"; case "SFX_MUSIC": return "SFX / MUSIK"; case "HOST_GUEST": return "MODERATOR / GAST";
+
+                // STRUCTURAL ELEMENTS
+                case "SCENE": return "SZENE"; case "ACTION": return "HANDLUNG"; case "CHARACTER": return "CHARAKTER"; case "PARENTHETICAL": return "KLAMMERBEMERKUNG"; case "DIALOGUE": return "DIALOG"; case "TRANSITION": return "ÜBERGANG";
+                case "PAGE": return "SEITE"; case "PANEL": return "PANEL"; case "CAPTION": return "BILDUNTERSCHRIFT";
+                case "CHAPTER": return "KAPITEL"; case "PROSE": return "TEXT"; case "ACT_SCENE": return "AKT / SZENE"; case "STAGE_DIRECTION": return "REGIEANWEISUNG"; case "SFX_MUSIC": return "SFX / MUSIK"; case "HOST_GUEST": return "MODERATOR / GAST";
+                case "TITLE": return "TITEL"; case "SUBHEADING": return "UNTERTITEL"; case "BODY": return "TEXT"; case "VERSE": return "VERS"; case "DATE": return "DATUM";
             }
         } else if (current == Lang.SPANISH) {
             switch (key) {
@@ -63,7 +70,12 @@ public class Localization {
                 case "Warning": return "Cambios no guardados"; case "Unsaved": return "¿Desea guardar los cambios antes de continuar?";
                 case "Screenplay": return "Guion cinematográfico"; case "Comic Book Script": return "Guion de cómic"; case "Novel": return "Novela"; case "Stage Play": return "Obra de teatro"; case "Podcast / Audio Drama": return "Podcast / Drama en audio";
                 case "Poetry": return "Poesía"; case "Article / Blog": return "Artículo / Blog"; case "Short Story": return "Historia corta"; case "Journal / Diary": return "Diario";
-                case "SCENE": return "ENCABEZADO DE ESCENA"; case "ACTION": return "ACCIÓN"; case "CHARACTER": return "PERSONAJE"; case "PARENTHETICAL": return "ACOTACIÓN"; case "DIALOGUE": return "DIÁLOGO"; case "TRANSITION": return "TRANSICIÓN"; case "PAGE_PANEL": return "PÁGINA / PANEL"; case "CAPTION": return "LEYENDA"; case "CHAPTER": return "CAPÍTULO"; case "PROSE": return "PROSA"; case "ACT_SCENE": return "ACTO / ESCENA"; case "STAGE_DIRECTION": return "ACOTACIÓN ESCÉNICA"; case "SFX_MUSIC": return "EFECTOS / MÚSICA"; case "HOST_GUEST": return "PRESENTADOR / INVITADO";
+
+                // STRUCTURAL ELEMENTS
+                case "SCENE": return "ENCABEZADO DE ESCENA"; case "ACTION": return "ACCIÓN"; case "CHARACTER": return "PERSONAJE"; case "PARENTHETICAL": return "ACOTACIÓN"; case "DIALOGUE": return "DIÁLOGO"; case "TRANSITION": return "TRANSICIÓN";
+                case "PAGE": return "PÁGINA"; case "PANEL": return "PANEL"; case "CAPTION": return "LEYENDA";
+                case "CHAPTER": return "CAPÍTULO"; case "PROSE": return "PROSA"; case "ACT_SCENE": return "ACTO / ESCENA"; case "STAGE_DIRECTION": return "ACOTACIÓN ESCÉNICA"; case "SFX_MUSIC": return "EFECTOS / MÚSICA"; case "HOST_GUEST": return "PRESENTADOR / INVITADO";
+                case "TITLE": return "TÍTULO"; case "SUBHEADING": return "SUBTÍTULO"; case "BODY": return "TEXTO"; case "VERSE": return "VERSO"; case "DATE": return "FECHA";
             }
         } else if (current == Lang.FRENCH) {
             switch (key) {
@@ -82,7 +94,12 @@ public class Localization {
                 case "Warning": return "Modifications non enregistrées"; case "Unsaved": return "Voulez-vous enregistrer vos modifications avant de continuer ?";
                 case "Screenplay": return "Scénario"; case "Comic Book Script": return "Scénario de bande dessinée"; case "Novel": return "Roman"; case "Stage Play": return "Pièce de théâtre"; case "Podcast / Audio Drama": return "Podcast / Fiction audio";
                 case "Poetry": return "Poésie"; case "Article / Blog": return "Article / Blog"; case "Short Story": return "Nouvelle"; case "Journal / Diary": return "Journal intime";
-                case "SCENE": return "EN-TÊTE DE SCÈNE"; case "ACTION": return "ACTION"; case "CHARACTER": return "PERSONNAGE"; case "PARENTHETICAL": return "DIDASCALIE"; case "DIALOGUE": return "DIALOGUE"; case "TRANSITION": return "TRANSITION"; case "PAGE_PANEL": return "PAGE / CASE"; case "CAPTION": return "LÉGENDE"; case "CHAPTER": return "CHAPITRE"; case "PROSE": return "PROSE"; case "ACT_SCENE": return "ACTE / SCÈNE"; case "STAGE_DIRECTION": return "INDICATION SCÉNIQUE"; case "SFX_MUSIC": return "BRUITAGE / MUSIQUE"; case "HOST_GUEST": return "ANIMATEUR / INVITÉ";
+
+                // STRUCTURAL ELEMENTS
+                case "SCENE": return "EN-TÊTE DE SCÈNE"; case "ACTION": return "ACTION"; case "CHARACTER": return "PERSONNAGE"; case "PARENTHETICAL": return "DIDASCALIE"; case "DIALOGUE": return "DIALOGUE"; case "TRANSITION": return "TRANSITION";
+                case "PAGE": return "PAGE"; case "PANEL": return "CASE"; case "CAPTION": return "LÉGENDE";
+                case "CHAPTER": return "CHAPITRE"; case "PROSE": return "PROSE"; case "ACT_SCENE": return "ACTE / SCÈNE"; case "STAGE_DIRECTION": return "INDICATION SCÉNIQUE"; case "SFX_MUSIC": return "BRUITAGE / MUSIQUE"; case "HOST_GUEST": return "ANIMATEUR / INVITÉ";
+                case "TITLE": return "TITRE"; case "SUBHEADING": return "SOUS-TITRE"; case "BODY": return "TEXTE"; case "VERSE": return "VERS"; case "DATE": return "DATE";
             }
         }
 
@@ -103,7 +120,13 @@ public class Localization {
             case "Warning": return "Unsaved Changes"; case "Unsaved": return "Do you want to save your changes before continuing?";
             case "Screenplay": return "Screenplay"; case "Comic Book Script": return "Comic Book Script"; case "Novel": return "Novel"; case "Stage Play": return "Stage Play"; case "Podcast / Audio Drama": return "Podcast";
             case "Poetry": return "Poetry"; case "Article / Blog": return "Article / Blog"; case "Short Story": return "Short Story"; case "Journal / Diary": return "Journal / Diary";
-            case "SCENE": return "SCENE HEADING"; case "ACTION": return "ACTION"; case "CHARACTER": return "CHARACTER"; case "PARENTHETICAL": return "PARENTHETICAL"; case "DIALOGUE": return "DIALOGUE"; case "TRANSITION": return "TRANSITION"; case "PAGE_PANEL": return "PAGE/PANEL"; case "CAPTION": return "CAPTION"; case "CHAPTER": return "CHAPTER"; case "PROSE": return "PROSE"; case "ACT_SCENE": return "ACT/SCENE"; case "STAGE_DIRECTION": return "STAGE DIRECTION"; case "SFX_MUSIC": return "SFX / MUSIC"; case "HOST_GUEST": return "HOST / GUEST";
+
+            // STRUCTURAL ELEMENTS
+            case "SCENE": return "SCENE HEADING"; case "ACTION": return "ACTION"; case "CHARACTER": return "CHARACTER"; case "PARENTHETICAL": return "PARENTHETICAL"; case "DIALOGUE": return "DIALOGUE"; case "TRANSITION": return "TRANSITION";
+            case "PAGE": return "PAGE"; case "PANEL": return "PANEL"; case "CAPTION": return "CAPTION";
+            case "CHAPTER": return "CHAPTER"; case "PROSE": return "PROSE"; case "ACT_SCENE": return "ACT/SCENE"; case "STAGE_DIRECTION": return "STAGE DIRECTION"; case "SFX_MUSIC": return "SFX / MUSIC"; case "HOST_GUEST": return "HOST / GUEST";
+            case "TITLE": return "TITLE / HEADING"; case "SUBHEADING": return "SUBHEADING"; case "BODY": return "BODY TEXT"; case "VERSE": return "VERSE"; case "DATE": return "DATE";
+
             case "Dark": return "Dark"; case "Light": return "Light"; case "Parchment": return "Parchment"; case "Vintage": return "Vintage"; case "Blueprint": return "Blueprint"; case "Dracula": return "Dracula"; case "Sunset": return "Sunset"; case "Ocean": return "Ocean"; case "Nord": return "Nord"; case "SolarizedDark": return "Solarized Dark"; case "SolarizedLight": return "Solarized Light"; case "Monokai": return "Monokai"; case "RosePine": return "Rosé Pine"; case "Coffee": return "Coffee"; case "Sepia": return "Sepia"; case "Forest": return "Forest"; case "Amethyst": return "Amethyst"; case "Hacker": return "Hacker";
         }
         return key;
