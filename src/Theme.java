@@ -1,35 +1,57 @@
 import java.awt.Color;
 
 public enum Theme {
-    // --- CLASSIC THEMES ---
-    DARK(new Color(28, 28, 30), new Color(220, 220, 225), new Color(40, 40, 42), new Color(90, 160, 220), new Color(100,100,100, 80), 0, "Dark"),
-    LIGHT(new Color(236, 236, 240), new Color(45, 45, 48), new Color(220, 220, 225), new Color(0, 100, 200), new Color(160,160,160, 100), 0, "Light"),
-    PARCHMENT(new Color(228, 218, 200), new Color(60, 50, 40), new Color(210, 200, 185), new Color(139, 69, 19), new Color(150, 130, 110, 90), 15, "Parchment"),
-    VINTAGE(new Color(210, 200, 185), new Color(45, 40, 40), new Color(195, 185, 170), new Color(150, 60, 60), new Color(150, 130, 110, 90), 20, "Vintage"),
-    BLUEPRINT(new Color(20, 45, 80), new Color(230, 245, 255), new Color(15, 35, 65), new Color(120, 200, 255), new Color(120, 180, 255, 90), 8, "Blueprint"),
-    DRACULA(new Color(40, 42, 54), new Color(248, 248, 242), new Color(33, 34, 44), new Color(255, 121, 198), new Color(98, 114, 164, 100), 0, "Dracula"),
-    SUNSET(new Color(45, 25, 25), new Color(255, 210, 170), new Color(35, 15, 15), new Color(255, 160, 90), new Color(150, 80, 80, 100), 0, "Sunset"),
-    OCEAN(new Color(15, 35, 45), new Color(210, 240, 255), new Color(10, 25, 35), new Color(50, 190, 210), new Color(60, 120, 150, 100), 0, "Ocean"),
+    // DARK MODE
+    DARK("Dark", "CatDark", new Color(30, 30, 30), new Color(220, 220, 220), new Color(100, 150, 255), new Color(20, 20, 20), new Color(50, 50, 50), 0),
+    DRACULA("Dracula", "CatDark", new Color(40, 42, 54), new Color(248, 248, 242), new Color(255, 121, 198), new Color(30, 31, 41), new Color(68, 71, 90), 0),
+    NORD("Nord", "CatDark", new Color(46, 52, 64), new Color(216, 222, 233), new Color(136, 192, 208), new Color(36, 41, 51), new Color(76, 86, 106), 0),
+    SOLARIZED_DARK("SolarizedDark", "CatDark", new Color(0, 43, 54), new Color(131, 148, 150), new Color(42, 161, 152), new Color(0, 33, 43), new Color(7, 54, 66), 0),
+    MONOKAI("Monokai", "CatDark", new Color(39, 40, 34), new Color(248, 248, 242), new Color(166, 226, 46), new Color(30, 31, 28), new Color(73, 72, 62), 0),
+    ROSE_PINE("RosePine", "CatDark", new Color(25, 23, 36), new Color(224, 222, 244), new Color(235, 111, 146), new Color(19, 17, 28), new Color(38, 35, 58), 0),
+    AMETHYST("Amethyst", "CatDark", new Color(30, 20, 40), new Color(220, 200, 240), new Color(180, 100, 255), new Color(20, 12, 28), new Color(60, 40, 80), 5),
+    MIDNIGHT("Midnight", "CatDark", new Color(5, 10, 20), new Color(180, 190, 220), new Color(100, 140, 255), new Color(2, 5, 12), new Color(30, 45, 80), 5),
+    VAMPIRE("Vampire", "CatDark", new Color(15, 5, 5), new Color(200, 180, 180), new Color(220, 20, 40), new Color(8, 2, 2), new Color(100, 20, 20), 10),
 
-    // --- 10 NEW THEMES ---
-    NORD(new Color(46, 52, 64), new Color(216, 222, 233), new Color(59, 66, 82), new Color(136, 192, 208), new Color(76, 86, 106, 100), 0, "Nord"),
-    SOLARIZED_DARK(new Color(0, 43, 54), new Color(131, 148, 150), new Color(7, 54, 66), new Color(38, 139, 210), new Color(88, 110, 117, 90), 0, "SolarizedDark"),
-    SOLARIZED_LIGHT(new Color(253, 246, 227), new Color(101, 123, 131), new Color(238, 232, 213), new Color(42, 161, 152), new Color(147, 161, 161, 90), 0, "SolarizedLight"),
-    MONOKAI(new Color(39, 40, 34), new Color(248, 248, 242), new Color(49, 50, 44), new Color(166, 226, 46), new Color(117, 113, 94, 100), 0, "Monokai"),
-    ROSE_PINE(new Color(25, 23, 36), new Color(224, 222, 244), new Color(31, 29, 46), new Color(235, 188, 186), new Color(110, 106, 134, 100), 0, "RosePine"),
-    COFFEE(new Color(44, 30, 22), new Color(218, 192, 163), new Color(56, 38, 28), new Color(212, 163, 115), new Color(112, 85, 65, 100), 8, "Coffee"),
-    SEPIA(new Color(245, 230, 200), new Color(90, 60, 30), new Color(225, 210, 180), new Color(180, 80, 40), new Color(190, 160, 120, 90), 15, "Sepia"),
-    FOREST(new Color(20, 35, 25), new Color(200, 220, 205), new Color(25, 45, 30), new Color(100, 180, 120), new Color(60, 90, 70, 100), 0, "Forest"),
-    AMETHYST(new Color(30, 15, 35), new Color(230, 210, 240), new Color(45, 25, 50), new Color(170, 100, 220), new Color(100, 60, 120, 100), 0, "Amethyst"),
-    HACKER(new Color(10, 10, 10), new Color(20, 220, 20), new Color(20, 20, 20), new Color(50, 255, 50), new Color(0, 100, 0, 100), 0, "Hacker");
+    // LIGHT MODE
+    LIGHT("Light", "CatLight", new Color(245, 245, 245), new Color(30, 30, 30), new Color(0, 100, 200), new Color(230, 230, 230), new Color(200, 200, 200), 0),
+    SOLARIZED_LIGHT("SolarizedLight", "CatLight", new Color(253, 246, 227), new Color(101, 123, 131), new Color(38, 139, 210), new Color(238, 232, 213), new Color(220, 210, 190), 0),
+    LAVENDER("Lavender", "CatLight", new Color(245, 240, 255), new Color(70, 50, 100), new Color(130, 90, 200), new Color(230, 220, 245), new Color(200, 180, 230), 5),
+    ARCTIC("Arctic", "CatLight", new Color(235, 245, 250), new Color(40, 60, 80), new Color(0, 150, 200), new Color(220, 235, 245), new Color(180, 210, 230), 0),
 
-    public final Color bg, fg, statusBg, accent, marginColor;
-    public final int noiseAlpha;
+    // NATURE & WARM
+    SUNSET("Sunset", "CatNature", new Color(45, 25, 30), new Color(255, 220, 180), new Color(255, 100, 80), new Color(30, 15, 20), new Color(80, 40, 50), 10),
+    OCEAN("Ocean", "CatNature", new Color(15, 35, 50), new Color(200, 230, 255), new Color(0, 200, 180), new Color(10, 25, 35), new Color(30, 70, 100), 15),
+    COFFEE("Coffee", "CatNature", new Color(50, 35, 25), new Color(220, 200, 180), new Color(180, 120, 80), new Color(35, 22, 15), new Color(80, 60, 45), 25),
+    FOREST("Forest", "CatNature", new Color(20, 40, 25), new Color(180, 220, 190), new Color(80, 200, 120), new Color(12, 25, 15), new Color(40, 80, 50), 10),
+    CHERRY_BLOSSOM("CherryBlossom", "CatNature", new Color(255, 245, 248), new Color(100, 60, 80), new Color(255, 105, 180), new Color(250, 230, 238), new Color(255, 180, 200), 5),
+    AUTUMN("Autumn", "CatNature", new Color(45, 25, 15), new Color(230, 200, 170), new Color(255, 120, 50), new Color(30, 15, 8), new Color(150, 80, 40), 15),
+
+    // RETRO & VINTAGE
+    PARCHMENT("Parchment", "CatRetro", new Color(240, 230, 210), new Color(60, 50, 40), new Color(180, 60, 60), new Color(220, 210, 190), new Color(200, 190, 170), 40),
+    VINTAGE("Vintage", "CatRetro", new Color(50, 40, 35), new Color(220, 200, 180), new Color(200, 100, 80), new Color(35, 25, 20), new Color(70, 60, 50), 30),
+    BLUEPRINT("Blueprint", "CatRetro", new Color(20, 40, 80), new Color(230, 240, 255), new Color(100, 180, 255), new Color(10, 25, 55), new Color(40, 80, 150), 20),
+    SEPIA("Sepia", "CatRetro", new Color(112, 66, 20), new Color(245, 230, 200), new Color(255, 180, 100), new Color(80, 45, 10), new Color(150, 90, 30), 30),
+    TYPEWRITER_CLASSIC("TypewriterClassic", "CatRetro", new Color(240, 235, 225), new Color(20, 20, 20), new Color(180, 50, 50), new Color(225, 220, 210), new Color(180, 175, 165), 35),
+
+    // SCI-FI & CYBER
+    HACKER("Hacker", "CatSciFi", new Color(5, 15, 5), new Color(0, 255, 0), new Color(200, 255, 200), new Color(0, 10, 0), new Color(0, 80, 0), 0),
+    CYBERPUNK("Cyberpunk", "CatSciFi", new Color(13, 2, 33), new Color(0, 255, 204), new Color(255, 0, 85), new Color(8, 1, 20), new Color(255, 0, 85), 15),
+    MATRIX("Matrix", "CatSciFi", new Color(0, 0, 0), new Color(0, 210, 0), new Color(150, 255, 150), new Color(0, 15, 0), new Color(0, 100, 0), 25),
+    SYNTHWAVE("Synthwave", "CatSciFi", new Color(43, 33, 90), new Color(255, 139, 255), new Color(0, 240, 255), new Color(30, 22, 65), new Color(255, 139, 255), 20);
+
     public final String langKey;
+    public final String categoryKey;
+    public final Color bg, fg, accent, statusBg, marginColor;
+    public final int noiseAlpha;
 
-    Theme(Color bg, Color fg, Color statusBg, Color accent, Color marginColor, int noiseAlpha, String langKey) {
-        this.bg = bg; this.fg = fg; this.statusBg = statusBg;
-        this.accent = accent; this.marginColor = marginColor;
-        this.noiseAlpha = noiseAlpha; this.langKey = langKey;
+    Theme(String langKey, String categoryKey, Color bg, Color fg, Color accent, Color statusBg, Color marginColor, int noiseAlpha) {
+        this.langKey = langKey;
+        this.categoryKey = categoryKey;
+        this.bg = bg;
+        this.fg = fg;
+        this.accent = accent;
+        this.statusBg = statusBg;
+        this.marginColor = marginColor;
+        this.noiseAlpha = noiseAlpha;
     }
 }

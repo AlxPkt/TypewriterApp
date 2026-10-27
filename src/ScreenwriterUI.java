@@ -208,12 +208,6 @@ public class ScreenwriterUI extends JFrame {
         viewMenu.add(fullscreenItem); viewMenu.add(focusItem); viewMenu.addSeparator();
         viewMenu.add(alignMenu); viewMenu.add(fixedCarriageToggle);
 
-        for (Theme t : Theme.values()) {
-            JMenuItem item = new JMenuItem();
-            item.addActionListener(e -> { Main.globalTheme = t; Main.savePreferences(); applyTheme(); });
-            themeMenu.add(item);
-        }
-
         String[] allFonts = {"Courier New", "Consolas", "Monospaced", "Georgia", "Times New Roman", "Arial", "Helvetica", "Century Gothic", "Verdana", "Tahoma", "Trebuchet MS", "Garamond", "Comic Sans MS"};
         for (String f : allFonts) {
             JMenuItem item = new JMenuItem(f);
@@ -326,7 +320,6 @@ public class ScreenwriterUI extends JFrame {
         if (Main.isFixedCarriage && scrollPane != null) {
             SwingUtilities.invokeLater(() -> {
                 try {
-                    // Changed to Java 8 compatible modelToView
                     Rectangle rect = textPane.modelToView(textPane.getCaretPosition());
                     if (rect == null) return;
 
@@ -452,6 +445,24 @@ public class ScreenwriterUI extends JFrame {
         fixedCarriageToggle.setText(Localization.get("FixedCarriage"));
 
         themeMenu.setText(Localization.get("Theme"));
+
+        // --- NEW: DYNAMICALLY REBUILDS THE THEME MENU INTO CATEGORY FOLDERS ---
+        themeMenu.removeAll();
+        String[] categories = {"CatDark", "CatLight", "CatNature", "CatRetro", "CatSciFi"};
+        for (String catKey : categories) {
+            JMenu subMenu = new JMenu(Localization.get(catKey));
+            for (Theme t : Theme.values()) {
+                if (t.categoryKey.equals(catKey)) {
+                    JMenuItem item = new JMenuItem(Localization.get(t.langKey));
+                    item.addActionListener(e -> { Main.globalTheme = t; Main.savePreferences(); applyTheme(); });
+                    subMenu.add(item);
+                }
+            }
+            if (subMenu.getItemCount() > 0) themeMenu.add(subMenu);
+        }
+        // Force the new category folders to match the global UI styling
+        styleMenuComponents(new MenuElement[]{themeMenu});
+
         fontMenu.setText(Localization.get("Font"));
         sizeMenu.setText(Localization.get("FontSize"));
         langMenu.setText(Localization.get("Language"));
@@ -466,7 +477,6 @@ public class ScreenwriterUI extends JFrame {
         focusToggleBtn.setText(Localization.get("Focus"));
         fullscreenToggleBtn.setText(Localization.get("Fullscreen"));
 
-        for (int i = 0; i < Theme.values().length; i++) themeMenu.getItem(i).setText(Localization.get(Theme.values()[i].langKey));
         updateStatus();
     }
 
@@ -545,7 +555,6 @@ public class ScreenwriterUI extends JFrame {
                 }
 
                 if (foundMatch) {
-                    // Changed to Java 8 compatible modelToView
                     Rectangle rect = textPane.modelToView(caretOffset);
                     if (rect != null) {
                         suggestionMenu.show(textPane, rect.x, rect.y + rect.height + 5);

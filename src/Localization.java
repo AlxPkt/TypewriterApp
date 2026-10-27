@@ -5,6 +5,13 @@ public class Localization {
     public static String get(String key) {
         if (current == Lang.CZECH) {
             switch (key) {
+                // Theme Categories
+                case "CatClassic": return "Klasické"; case "CatDark": return "Tmavý režim"; case "CatLight": return "Světlý režim"; case "CatNature": return "Příroda a Teplo"; case "CatRetro": return "Retro a Vintage"; case "CatSciFi": return "Sci-Fi a Cyber";
+
+                // New Themes
+                case "Cyberpunk": return "Cyberpunk"; case "Matrix": return "Matrix"; case "Synthwave": return "Synthwave"; case "Midnight": return "Půlnoc"; case "Vampire": return "Upír"; case "Lavender": return "Levandule"; case "Arctic": return "Arktida"; case "CherryBlossom": return "Třešňový květ"; case "Autumn": return "Podzim"; case "TypewriterClassic": return "Klasický psací stroj";
+
+                // Standard UI
                 case "File": return "Soubor"; case "New": return "Nový dokument..."; case "Open": return "Otevřít dokument..."; case "Save": return "Uložit jako .txt..."; case "Print": return "Vytisknout..."; case "Exit": return "Ukončit program";
                 case "View": return "Zobrazení"; case "Fullscreen": return "Celá obrazovka"; case "Focus": return "Režim soustředění";
                 case "LockON": return "Ukotvení: ZAP"; case "LockOFF": return "Ukotvení: VYP";
@@ -22,6 +29,9 @@ public class Localization {
             }
         } else if (current == Lang.GERMAN) {
             switch (key) {
+                case "CatClassic": return "Klassisch"; case "CatDark": return "Dunkelmodus"; case "CatLight": return "Hellmodus"; case "CatNature": return "Natur & Warm"; case "CatRetro": return "Retro & Vintage"; case "CatSciFi": return "Sci-Fi & Cyber";
+                case "Cyberpunk": return "Cyberpunk"; case "Matrix": return "Matrix"; case "Synthwave": return "Synthwave"; case "Midnight": return "Mitternacht"; case "Vampire": return "Vampir"; case "Lavender": return "Lavendel"; case "Arctic": return "Arktis"; case "CherryBlossom": return "Kirschblüte"; case "Autumn": return "Herbst"; case "TypewriterClassic": return "Klassische Schreibmaschine";
+
                 case "File": return "Datei"; case "New": return "Neu..."; case "Open": return "Öffnen..."; case "Save": return "Speichern als .txt..."; case "Print": return "Drucken..."; case "Exit": return "Beenden";
                 case "View": return "Ansicht"; case "Fullscreen": return "Vollbild"; case "Focus": return "Fokus-Modus";
                 case "LockON": return "Menü: EIN"; case "LockOFF": return "Menü: AUS";
@@ -38,6 +48,9 @@ public class Localization {
             }
         } else if (current == Lang.SPANISH) {
             switch (key) {
+                case "CatClassic": return "Clásico"; case "CatDark": return "Modo Oscuro"; case "CatLight": return "Modo Claro"; case "CatNature": return "Naturaleza y Cálido"; case "CatRetro": return "Retro y Vintage"; case "CatSciFi": return "Ciencia Ficción";
+                case "Cyberpunk": return "Cyberpunk"; case "Matrix": return "Matrix"; case "Synthwave": return "Synthwave"; case "Midnight": return "Medianoche"; case "Vampire": return "Vampiro"; case "Lavender": return "Lavanda"; case "Arctic": return "Ártico"; case "CherryBlossom": return "Flor de Cerezo"; case "Autumn": return "Otoño"; case "TypewriterClassic": return "Máquina de escribir clásica";
+
                 case "File": return "Archivo"; case "New": return "Nuevo..."; case "Open": return "Abrir..."; case "Save": return "Guardar como .txt..."; case "Print": return "Imprimir..."; case "Exit": return "Salir";
                 case "View": return "Ver"; case "Fullscreen": return "Pantalla completa"; case "Focus": return "Modo enfoque";
                 case "LockON": return "Bloqueo: ON"; case "LockOFF": return "Bloqueo: OFF";
@@ -54,6 +67,9 @@ public class Localization {
             }
         } else if (current == Lang.FRENCH) {
             switch (key) {
+                case "CatClassic": return "Classique"; case "CatDark": return "Mode Sombre"; case "CatLight": return "Mode Clair"; case "CatNature": return "Nature & Chaleur"; case "CatRetro": return "Rétro & Vintage"; case "CatSciFi": return "Science-Fiction";
+                case "Cyberpunk": return "Cyberpunk"; case "Matrix": return "Matrix"; case "Synthwave": return "Synthwave"; case "Midnight": return "Minuit"; case "Vampire": return "Vampire"; case "Lavender": return "Lavande"; case "Arctic": return "Arctique"; case "CherryBlossom": return "Fleur de Cerisier"; case "Autumn": return "Automne"; case "TypewriterClassic": return "Machine à écrire classique";
+
                 case "File": return "Fichier"; case "New": return "Nouveau..."; case "Open": return "Ouvrir..."; case "Save": return "Enregistrer sous .txt..."; case "Print": return "Imprimer..."; case "Exit": return "Quitter";
                 case "View": return "Affichage"; case "Fullscreen": return "Plein écran"; case "Focus": return "Mode concentration";
                 case "LockON": return "Verrou: OUI"; case "LockOFF": return "Verrou: NON";
@@ -72,6 +88,9 @@ public class Localization {
 
         // DEFAULT ENGLISH
         switch (key) {
+            case "CatClassic": return "Classic"; case "CatDark": return "Dark Mode"; case "CatLight": return "Light Mode"; case "CatNature": return "Nature & Warm"; case "CatRetro": return "Retro & Vintage"; case "CatSciFi": return "Sci-Fi & Cyber";
+            case "Cyberpunk": return "Cyberpunk"; case "Matrix": return "Matrix"; case "Synthwave": return "Synthwave"; case "Midnight": return "Midnight"; case "Vampire": return "Vampire"; case "Lavender": return "Lavender"; case "Arctic": return "Arctic"; case "CherryBlossom": return "Cherry Blossom"; case "Autumn": return "Autumn"; case "TypewriterClassic": return "Typewriter Classic";
+
             case "File": return "File"; case "New": return "New..."; case "Open": return "Open..."; case "Save": return "Save to .txt..."; case "Print": return "Print..."; case "Exit": return "Exit";
             case "View": return "View"; case "Fullscreen": return "Fullscreen"; case "Focus": return "Focus Mode";
             case "LockON": return "Lock: ON"; case "LockOFF": return "Lock: OFF";
